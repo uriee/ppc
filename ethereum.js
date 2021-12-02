@@ -3,7 +3,7 @@ import PPIToken from './contract/PPIToken.json';
 
 const getBlockchain = () => new Promise((resolve, reject) => {
     console.log("A")
-    window.addEventListener('load', async () => {
+    const xxx = async () => {
         console.log("B")
         if(window.ethereum) {
             console.log("C")
@@ -20,7 +20,8 @@ const getBlockchain = () => new Promise((resolve, reject) => {
 
             resolve({signerAddress, ppiToken});
         }
-    })
+    }
+    xxx();
 })
 
 export default getBlockchain;

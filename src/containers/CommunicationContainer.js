@@ -6,7 +6,7 @@ import store from '../store'
 import { connect } from 'react-redux'
 
 import getBlockchain from '../../ethereum.js';
-import regeneratorRuntime from "regenerator-runtime"
+import regeneratorRuntime, { async } from "regenerator-runtime"
 
 class CommunicationContainer extends React.Component {
   constructor(props) {
@@ -137,22 +137,28 @@ class CommunicationContainer extends React.Component {
     //Set Allowance
     const ret = await this.ppiToken.approve(addr_b, this.props.firstPay + '000000000')
     console.log("SEND 2",ret)
-    //const ret2 = await wait(ret)
-    //console.log("SEND 3",ret2)
+    const ret2 = await ret.wait()
+    console.log("SEND 3",ret2)
     this.props.socket.emit('auth', this.state);
     this.hideAuth();
   }
 
+  Accept = async () => {
+    console.log("Accept",this.state.addr_v, this.signerAddress, this.state.firstpay + '000000000')
+    const ret = await this.ppiToken.transferFrom(this.state.addr_v.addr_v, this.signerAddress,  this.state.addr_v.firstpay + '000000000')
+    await ret.wait()
+    this.props.socket.emit('accept', this.state.sid);
+  }
+
   handleInvitation(e) {
     e.preventDefault();
-    console.log("HaNDLE INVETITION")
+    console.log("HaNDLE INVETITION",e.target.dataset.ref)
     if (e.target.dataset.ref == 'accept') {
-      //transferFrom(sender,recp,amount)
-      console.log("Accept",this.state.addr_v, this.signerAddress, this.state.firstPay + '000000000')
-      //const ret = await this.ppiToken.transferFrom(this.state.addr_v, this.signerAddress, this.state.firstPay + '000000000')
+      this.Accept()
+    }else{
+      this.props.socket.emit('reject', this.state.sid);
     }
-    this.props.socket.emit([e.target.dataset.ref], this.state.sid);
-    this.hideAuth();
+    this.hideAuth();  
   }
 
   toggleVideo() {
