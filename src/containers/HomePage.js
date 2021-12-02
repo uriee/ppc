@@ -7,17 +7,18 @@ class HomePage extends Component {
     super(props);
     this.defaultRoomId = String(new Date() - new Date().setHours(0, 0, 0, 0));
     this.state = { roomId: this.defaultRoomId };
-    this.handleChange = this.handleChange.bind(this);
+    this.handleIdChange = this.handleIdChange.bind(this);  
   }
-  handleChange(e) {
+  handleIdChange(e) {
     this.setState({ roomId: e.target.value });
   }
+
   render(){
     return (
       <Home
         defaultRoomId={this.defaultRoomId}
         roomId={this.state.roomId}
-        handleChange={this.handleChange}
+        handleIdChange={this.handleIdChange}
       />
     );
   }

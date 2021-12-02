@@ -25,10 +25,15 @@ app.use(favicon('./dist/favicon.ico'));
 // Switch off the default 'X-Powered-By: Express' header
 app.disable('x-powered-by');
 io.sockets.on('connection', socket => {
+  console.log("connection")
   let room = '';
   // sending to all clients in the room (channel) except sender
-  socket.on('message', message => socket.broadcast.to(room).emit('message', message));
+  socket.on('message', message => {
+    console.log("messgae",message)
+    socket.broadcast.to(room).emit('message', message)
+  });
   socket.on('find', () => {
+    console.log("find")
     const url = socket.request.headers.referer.split('/');
     room = url[url.length - 1];
     const sr = io.sockets.adapter.rooms[room];
@@ -42,18 +47,48 @@ io.sockets.on('connection', socket => {
       socket.emit('full', room);
     }
   });
+
+  socket.on('addr_v', data => {
+    console.log("addr_v",data)
+    //data.sid = socket.sid;
+    let ret = {addr_v : data , sid: socket.id}
+    // sending to all clients in the room (channel) except sender
+    socket.broadcast.to(room).emit('addr_v', ret);
+  });
+
+  socket.on('addr_b', data => {
+    
+    let {addr_b , sid} = data
+    console.log("addr_b",addr_b,sid,data)
+    data.bsid = socket.id;
+
+    // sending to all clients in the room (channel) except sender
+    io.to(sid).emit('addr_b',data)
+    ///socket.broadcast.to(room).emit('addr_b', data);
+  });
+    
+  
   socket.on('auth', data => {
+    console.log("auth",data)
     data.sid = socket.id;
     // sending to all clients in the room (channel) except sender
     socket.broadcast.to(room).emit('approve', data);
   });
+
   socket.on('accept', id => {
+    console.log("accept",id)
     io.sockets.connected[id].join(room);
     // sending to all clients in 'game' room(channel), include sender
     io.in(room).emit('bridge');
   });
-  socket.on('reject', () => socket.emit('full'));
+
+  socket.on('reject', () => {
+    console.log("reject")
+    socket.emit('full')
+  });
+  
   socket.on('leave', () => {
+    console.log("leave")
     // sending to all clients in the room (channel) except sender
     socket.broadcast.to(room).emit('hangup');
     socket.leave(room);});

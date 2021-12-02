@@ -13,6 +13,9 @@
     "build": "webpack --mode production",
     "postinstall": "webpack --mode production"
   },
+  "resolutions": {
+    "glob-parent": "^6.0.2"
+  },
   "author": "Dian Dimitrov",
   "keywords": [
     "WebRTC Video Chat",
@@ -24,21 +27,30 @@
     "@babel/core": "^7.5.5",
     "@babel/preset-env": "^7.5.5",
     "@babel/preset-react": "^7.0.0",
-    "babel-loader": "^8.0.6",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^8.2.3",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
     "css-loader": "^3.2.0",
+    "source-map-loader": "^1.1.3",
     "style-loader": "^0.21.0",
     "webpack": "^4.39.3",
-    "webpack-cli": "^3.3.7"
+    "webpack-cli": "^4.9.1"
   },
   "dependencies": {
     "compression": "^1.7.2",
+    "ethers": "^5.5.1",
     "express": "^4.16.3",
     "react": "^16.4.0",
     "react-dom": ">=16.7.0",
     "react-redux": "^5.0.7",
     "react-router-dom": "^4.3.1",
     "redux": "^4.0.0",
+    "regenerator-runtime": "^0.13.9",
     "serve-favicon": "^2.5.0",
-    "socket.io": "^2.4.0"
+    "socket.io": "^2.4.0",
+    "watchpack": "^2.2.0",
+    "web3": "^1.6.1"
   }
 }

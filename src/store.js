@@ -7,7 +7,11 @@ const persistedState = localStorage.getItem('reduxState')
 	: {
 		rooms: [],
 		video: true,
-		audio: true
+		audio: true,
+		fee: 0,
+		interval: 5,
+		firstPay : 0,
+		token: {}
 	};
 const store = createStore(reducers, persistedState);
 store.subscribe(mapStoreToStorage);
