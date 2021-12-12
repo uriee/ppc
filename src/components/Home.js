@@ -51,9 +51,6 @@ Home.propTypes = {
   handleFirstPayChange: PropTypes.func,
   defaultRoomId: PropTypes.string.isRequired,
   roomId: PropTypes.string.isRequired,
-  //roomFee: PropTypes.number,
-  //roomInterval: PropTypes.number,
-  //firstPay: PropTypes.number,
   rooms: PropTypes.array.isRequired
 };
 
@@ -67,7 +64,6 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     handleIntervalChange: (e) => store.dispatch({ type: 'SET_INTERVAL', interval:  e.target.value}),
     handleFeeChange: (e) =>  store.dispatch({ type: 'SET_FEE', fee:  e.target.value}),
     handleFirstPayChange: (e) => store.dispatch({ type: 'SET_FP', firstPay:  e.target.value}),
-    handleIntervalChange: (e) => store.dispatch({ type: 'SET_INTERVAL', interval:  e.target.value}),
     setppi: (token, signer) => store.dispatch({ type: 'SET_TOKEN', token : {token: token, signer: signer}}),
   }
 )};

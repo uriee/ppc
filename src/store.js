@@ -1,7 +1,9 @@
 import { createStore } from 'redux';
 import reducers from './reducers';
-const mapStoreToStorage = () =>
+const mapStoreToStorage = () => {
 	localStorage.setItem('reduxState', JSON.stringify(store.getState()));
+	console.log("store",store.getState())
+}
 const persistedState = localStorage.getItem('reduxState')
 	? JSON.parse(localStorage.getItem('reduxState'))
 	: {
@@ -11,7 +13,8 @@ const persistedState = localStorage.getItem('reduxState')
 		fee: 0,
 		interval: 5,
 		firstPay : 0,
-		token: {}
+		token: {},
+		owner: false
 	};
 const store = createStore(reducers, persistedState);
 store.subscribe(mapStoreToStorage);

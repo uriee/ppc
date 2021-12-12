@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
 import { PropTypes } from 'prop-types';
+import store from '../store'
+import history from '../history'
+import { Redirect } from 'react-router-dom';
 
 class MediaBridge extends Component {
   constructor(props) {
@@ -33,8 +36,23 @@ class MediaBridge extends Component {
     this.props.socket.emit('leave');
   }
   onRemoteHangup() {
-    this.setState({user: 'host', bridge: 'host-hangup'});
+    console.log("media container: on remote hangup");
+    const owner = store.getState().owner;
+    console.log("OWNER onRemoteHangup",owner)
+    if(owner){
+      console.log('yy2')
+      this.setState({bridge: 'host-hangup'})
+      console.log('yy3')
+    }else{
+      console.log('yy3')
+      this.setState({bridge: 'host-hangup'})
+      console.log('yy4')
+      history.push("/");
+      //window.history.pushState({}, '', '/');
+      //return <Redirect to='/' />
+    }
   }
+
   onMessage(message) {
       if (message.type === 'offer') {
             // set remote description and answer
@@ -67,6 +85,7 @@ class MediaBridge extends Component {
       };
   }
   setDescription(offer) {
+    console.log("setDesc",offer)
     return this.pc.setLocalDescription(offer);
   }
   // send the offer to a server to be forwarded to the other peer
@@ -74,9 +93,25 @@ class MediaBridge extends Component {
     this.props.socket.send(this.pc.localDescription);
   }
   hangup() {
-    this.setState({user: 'guest', bridge: 'guest-hangup'});
-    this.pc.close();
+    console.log("hhhhhhhhhhhhh")
+    //this.setState({bridge: 'guest-hangup'});
+    //this.setState({user: 'guest', bridge: 'guest-hangup'});
+    const owner = store.getState().owner;
+    console.log("OWNER hangup",owner)
+    if(owner) {
+      console.log("xx1")
+      this.setState({bridge: 'host-hangup'})
+      console.log("xx2")
+    } else {
+      console.log("xx3")
+      this.setState({bridge: 'full'})
+      console.log("xx4")
+
+      console.log("xx5")
+    }  
+    this.pc.close()
     this.props.socket.emit('leave');
+
   }
   handleError(e) {
     console.log(e);
@@ -91,6 +126,7 @@ class MediaBridge extends Component {
         .then(this.setDescription)
         .then(this.sendDescription)
         .catch(this.handleError); // An error occurred, so handle the failure to connect
+        
     }
     // set up the peer connection
     // this is one of Google's public STUN servers

@@ -27,6 +27,8 @@ app.disable('x-powered-by');
 io.sockets.on('connection', socket => {
   console.log("connection")
   let room = '';
+  let broadcaster_id = '';
+  let viewr_id = ''
   // sending to all clients in the room (channel) except sender
   socket.on('message', message => {
     console.log("messgae",message)
@@ -41,8 +43,10 @@ io.sockets.on('connection', socket => {
       // no room with such name is found so create it
       socket.join(room);
       socket.emit('create');
+      broadcaster_id = socket.id;
     } else if (sr.length === 1) {
       socket.emit('join');
+      viewr_id = socket.id;
     } else { // max two clients
       socket.emit('full', room);
     }
@@ -91,6 +95,25 @@ io.sockets.on('connection', socket => {
     console.log("leave")
     // sending to all clients in the room (channel) except sender
     socket.broadcast.to(room).emit('hangup');
-    socket.leave(room);});
+    if (socket.id == broadcaster_id) {
+      viewr_id && io.sockets.connected[viewr_id].leave(room);
+      console.log("VIEWR_ID_1",viewr_id);
+    }else {
+      socket.leave(room);
+    }
+    
+  });
+
+  socket.on('end', () => {
+    console.log("end")
+    // sending to all clients in the room (channel) except sender
+    socket.broadcast.to(room).emit('hangup');
+    viewr_id &&  io.sockets.connected[viewr_id].leave(room);
+    console.log("VIEWR_ID_2",viewr_id);
+    socket.leave(room);
+  });
+
 });
+
+
 

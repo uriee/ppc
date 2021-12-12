@@ -6,6 +6,7 @@ import videoReducer from './video-reducer';
 import feeReducer from './fee-reducer';
 import intervalReducer from './interval-reducer';
 import firstPayReducer from './firstpay-reducer';
+import ownerReducer from './owner-reducer';
 import tokenReducer from './token-reducer';
 // Combine Reducers
 const reducers = combineReducers({
@@ -15,6 +16,7 @@ const reducers = combineReducers({
   fee: feeReducer,
   interval: intervalReducer,
   firstPay: firstPayReducer,
+  owner: ownerReducer,
   token: tokenReducer
 });
 export default reducers;

@@ -2,6 +2,7 @@ import React from 'react';
 import { PropTypes } from 'prop-types';
 import { Link } from 'react-router-dom';
 import ToggleFullScreen from './ToggleFullScreen';
+import store from '../store'
 
 const Communication = props =>
   <div className="auth">
@@ -43,8 +44,9 @@ const Communication = props =>
       </form>
     </div>
     <div className="grant-access">
-      <p>A peer has sent you a message to join the room:</p>
-      <div>{props.message}</div>
+      <p>A Viewr Wants to Chat:</p>
+      <div>Message: {props.message}</div>
+      <div>User Approved Payment of: {props.firstPay} : {store.getState().firstPay}  PPC tokens</div>
       <button onClick={props.handleInvitation} data-ref="reject" className="primary-button">Reject</button>
       <button onClick={props.handleInvitation} data-ref="accept" className="primary-button">Accept</button>
     </div>

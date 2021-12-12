@@ -57,6 +57,7 @@ class CommunicationContainer extends React.Component {
     socket.on('create', () => {
       console.log("create")
       this.props.media.setState({user: 'host', bridge: 'create'})
+      store.dispatch({ type: 'SET_OWNER', owner: true})
     });
 
     socket.on('full', this.full);
@@ -68,6 +69,7 @@ class CommunicationContainer extends React.Component {
     socket.on('join', () => {
       // allowance
       this.props.media.setState({user: 'guest', bridge: 'join'})
+      store.dispatch({ type: 'SET_OWNER', owner: false})
     });
 
     socket.on('approve', ({ message, sid }) => {
@@ -91,7 +93,7 @@ class CommunicationContainer extends React.Component {
       console.log("addr_b",addr_b,sid)
       //save addr on viewr_add state variable
       this.setState({addr_b});
-      this.realSend(addr_b);
+      this.approve(addr_b);
     });
 
     socket.emit('find');
@@ -108,8 +110,6 @@ class CommunicationContainer extends React.Component {
       let { signerAddress, ppiToken } = await getBlockchain();
       this.signerAddress = signerAddress
       this.ppiToken = ppiToken
-      //const name = await ppiToken.name();
-      //console.log("Name:",name)
     };
     !this.ppiToken && init();        
 
@@ -132,22 +132,29 @@ class CommunicationContainer extends React.Component {
   }
 
 
-  realSend = async (addr_b) => {
+  approve = async (addr_b) => {
     console.log("SEND",addr_b, this.props.firstPay + '000000000',this.ppiToken) 
     //Set Allowance
     const ret = await this.ppiToken.approve(addr_b, this.props.firstPay + '000000000')
-    console.log("SEND 2",ret)
-    const ret2 = await ret.wait()
-    console.log("SEND 3",ret2)
-    this.props.socket.emit('auth', this.state);
-    this.hideAuth();
+    const confirmation = await ret.wait()
+    console.log("SEND 3",confirmation)
+    if (confirmation.status === 1) {
+      this.props.socket.emit('auth', this.state);
+      this.hideAuth();
+    }
   }
 
   Accept = async () => {
     console.log("Accept",this.state.addr_v, this.signerAddress, this.state.firstpay + '000000000')
     const ret = await this.ppiToken.transferFrom(this.state.addr_v.addr_v, this.signerAddress,  this.state.addr_v.firstpay + '000000000')
-    await ret.wait()
-    this.props.socket.emit('accept', this.state.sid);
+    const accept =  await ret.wait()
+    console.log("ACCEPT:",accept)
+    if (accept.status == 1) {
+      this.props.socket.emit('accept', this.state.sid);
+    }else{
+      this.props.socket.emit('reject', this.state.sid);
+      this.hideAuth();
+    }
   }
 
   handleInvitation(e) {
@@ -174,7 +181,7 @@ class CommunicationContainer extends React.Component {
     this.props.setAudio(audio);
   }
   handleHangup() {
-    console.log("Hung up")
+    console.log("Hang up")
     this.props.media.hangup();
   }
   render(){
