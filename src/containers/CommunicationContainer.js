@@ -46,10 +46,12 @@ class CommunicationContainer extends React.Component {
     console.log("HIDE")
     this.props.media.setState({bridge: 'connecting'});
   } 
+
   full() {
-    console.log("FULL")
+    console.log("FULL", this.props.media)
     this.props.media.setState({bridge: 'full'});
   }
+
   componentDidMount() {
     const socket = this.props.socket;
     this.setState({video: this.props.video, audio: this.props.audio});
@@ -61,6 +63,7 @@ class CommunicationContainer extends React.Component {
     });
 
     socket.on('full', this.full);
+
     socket.on('bridge', role => {
       console.log("bridge")
       this.props.media.init()
@@ -79,10 +82,16 @@ class CommunicationContainer extends React.Component {
     });
 
     socket.on('addr_v', ({ addr_v, sid, firstPay }) => {
-      console.log("addr_v",addr_v,sid, firstPay)
+      console.log("addr_v",addr_v,sid, store.getState().fee)
+      console.log("CHECK1", store.getState().fee < addr_v.firstpay)
+      console.log("CHECK2", parseInt(store.getState().fee) >= parseInt(addr_v.firstpay))
       //save addr on viewr_add state variable
-      this.setState({ addr_v, firstPay});
-      // get the signerAddr and emit it with addr_b
+      this.setState({ addr_v: addr_v.addr_v, firstPay: addr_v.firstpay });
+      if (parseInt(store.getState().fee) >= parseInt(addr_v.firstpay)) {
+        this.props.socket.emit('reject', this.state.sid)
+        return;
+      }
+      store.dispatch({ type: 'SET_FP', firstPay:  addr_v.firstpay})
       let addr_b = this.signerAddress;
       let ret = {addr_b, sid }
       console.log("sending addr_b : ",ret,this.state)
@@ -145,8 +154,12 @@ class CommunicationContainer extends React.Component {
   }
 
   Accept = async () => {
-    console.log("Accept",this.state.addr_v, this.signerAddress, this.state.firstpay + '000000000')
-    const ret = await this.ppiToken.transferFrom(this.state.addr_v.addr_v, this.signerAddress,  this.state.addr_v.firstpay + '000000000')
+    console.log("Accept",this.state.addr_v, this.signerAddress, this.state.firstPay + '000000000',store.fee,store.getState().fee)
+    if (this.state.firstPay < store.fee) {
+      this.props.socket.emit('reject', this.state.sid);
+      return;
+    }
+    const ret = await this.ppiToken.transferFrom(this.state.addr_v, this.signerAddress,  this.state.firstPay + '000000000')
     const accept =  await ret.wait()
     console.log("ACCEPT:",accept)
     if (accept.status == 1) {
