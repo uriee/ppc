@@ -12,7 +12,7 @@ const persistedState = localStorage.getItem('reduxState')
 		audio: true,
 		fee: 0,
 		interval: 5,
-		firstPay : 0,
+		payment : 0,
 		token: {},
 		owner: false
 	};

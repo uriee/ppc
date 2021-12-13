@@ -5,7 +5,7 @@ import audioReducer from './audio-reducer';
 import videoReducer from './video-reducer';
 import feeReducer from './fee-reducer';
 import intervalReducer from './interval-reducer';
-import firstPayReducer from './firstpay-reducer';
+import paymentReducer from './payment-reducer';
 import ownerReducer from './owner-reducer';
 import tokenReducer from './token-reducer';
 // Combine Reducers
@@ -15,7 +15,7 @@ const reducers = combineReducers({
   audio: audioReducer,
   fee: feeReducer,
   interval: intervalReducer,
-  firstPay: firstPayReducer,
+  payment: paymentReducer,
   owner: ownerReducer,
   token: tokenReducer
 });

@@ -18,7 +18,8 @@ class CommunicationContainer extends React.Component {
       video: true,
       addr_v: null,
       addr_b: null,
-      firstPay : 0
+      payment : 0,
+      minutes: 0
     };
 
     this.handleInvitation = this.handleInvitation.bind(this);
@@ -55,6 +56,12 @@ class CommunicationContainer extends React.Component {
   componentDidMount() {
     const socket = this.props.socket;
     this.setState({video: this.props.video, audio: this.props.audio});
+    const state = store.getState();
+    const stateObj = {
+      fee: state.fee,
+      interval: state.interval,
+      payment: state.payment
+    }
 
     socket.on('create', () => {
       console.log("create")
@@ -64,13 +71,15 @@ class CommunicationContainer extends React.Component {
 
     socket.on('full', this.full);
 
-    socket.on('bridge', role => {
-      console.log("bridge")
+    socket.on('bridge', props => {
+      console.log("bridge",props)
+      props.interval && this.setState({ minutes: props.interval });
       this.props.media.init()
     });
 
-    socket.on('join', () => {
+    socket.on('join', (props) => {
       // allowance
+      console.log("FEE INTERVAL:",props);
       this.props.media.setState({user: 'guest', bridge: 'join'})
       store.dispatch({ type: 'SET_OWNER', owner: false})
     });
@@ -81,19 +90,20 @@ class CommunicationContainer extends React.Component {
       this.setState({ message, sid });
     });
 
-    socket.on('addr_v', ({ addr_v, sid, firstPay }) => {
-      console.log("addr_v",addr_v,sid, store.getState().fee)
-      console.log("CHECK1", store.getState().fee < addr_v.firstpay)
-      console.log("CHECK2", parseInt(store.getState().fee) >= parseInt(addr_v.firstpay))
+    socket.on('addr_v', ({ addr_v, sid, payment }) => {
+      const state = store.getState();
+      console.log("addr_v",addr_v,sid, state.fee)
+      console.log("CHECK1", state.fee < addr_v.payment)
+      console.log("CHECK2", parseInt(state.fee) >= parseInt(addr_v.payment))
       //save addr on viewr_add state variable
-      this.setState({ addr_v: addr_v.addr_v, firstPay: addr_v.firstpay });
-      if (parseInt(store.getState().fee) >= parseInt(addr_v.firstpay)) {
+      this.setState({ addr_v: addr_v.addr_v, payment: addr_v.payment });
+      if (parseInt(state.fee) >= parseInt(addr_v.payment)) {
         this.props.socket.emit('reject', this.state.sid)
         return;
       }
-      store.dispatch({ type: 'SET_FP', firstPay:  addr_v.firstpay})
+      store.dispatch({ type: 'SET_PAYMENT', payment:  addr_v.payment})
       let addr_b = this.signerAddress;
-      let ret = {addr_b, sid }
+      let ret = {addr_b, sid ,fee: state.fee, interval: state.interval }
       console.log("sending addr_b : ",ret,this.state)
       addr_b && this.props.socket.emit('addr_b', ret);
     });
@@ -105,7 +115,7 @@ class CommunicationContainer extends React.Component {
       this.approve(addr_b);
     });
 
-    socket.emit('find');
+    socket.emit('find', stateObj);
     console.log("emitted find")
     this.props.getUserMedia
       .then(stream => {
@@ -126,14 +136,14 @@ class CommunicationContainer extends React.Component {
   handleInput(e) {
     this.setState({[e.target.dataset.ref]: e.target.value});
   }
-
+  
   send = async(e) => {
     e.preventDefault();
     console.log("SWAP",this.ppiToken, this.signerAddress)
     if(this.signerAddress) {
       let obj = {
         addr_v: this.signerAddress,
-        firstpay : this.props.firstPay
+        payment : this.props.payment
       }
       this.props.socket.emit('addr_v', obj);
       this.hideAuth();
@@ -142,9 +152,9 @@ class CommunicationContainer extends React.Component {
 
 
   approve = async (addr_b) => {
-    console.log("SEND",addr_b, this.props.firstPay + '000000000',this.ppiToken) 
+    console.log("SEND",addr_b, this.props.payment + '000000000',this.ppiToken) 
     //Set Allowance
-    const ret = await this.ppiToken.approve(addr_b, this.props.firstPay + '000000000')
+    const ret = await this.ppiToken.approve(addr_b, this.props.payment + '000000000')
     const confirmation = await ret.wait()
     console.log("SEND 3",confirmation)
     if (confirmation.status === 1) {
@@ -154,12 +164,12 @@ class CommunicationContainer extends React.Component {
   }
 
   Accept = async () => {
-    console.log("Accept",this.state.addr_v, this.signerAddress, this.state.firstPay + '000000000',store.fee,store.getState().fee)
-    if (this.state.firstPay < store.fee) {
+    console.log("Accept",this.state.addr_v, this.signerAddress, this.state.payment + '000000000',store.fee,store.getState().fee)
+    if (this.state.payment < store.fee) {
       this.props.socket.emit('reject', this.state.sid);
       return;
     }
-    const ret = await this.ppiToken.transferFrom(this.state.addr_v, this.signerAddress,  this.state.firstPay + '000000000')
+    const ret = await this.ppiToken.transferFrom(this.state.addr_v, this.signerAddress,  this.state.payment + '000000000')
     const accept =  await ret.wait()
     console.log("ACCEPT:",accept)
     if (accept.status == 1) {
@@ -204,13 +214,14 @@ class CommunicationContainer extends React.Component {
         toggleVideo={this.toggleVideo}
         toggleAudio={this.toggleAudio}
         send={this.send}
+        minutes={this.state.minutes}
         handleHangup={this.handleHangup}
         handleInput={this.handleInput}
         handleInvitation={this.handleInvitation} />
     );
   }
 }
-const mapStateToProps = store => ({video: store.video, audio: store.audio, fee: store.fee, interval: store.interval, firstPay: store.firstPay, token:store.token});
+const mapStateToProps = store => ({video: store.video, audio: store.audio, fee: store.fee, interval: store.interval, payment: store.payment, token:store.token});
 const mapDispatchToProps = dispatch => (
   {
     setVideo: boo => store.dispatch({type: 'SET_VIDEO', video: boo}),

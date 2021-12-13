@@ -29,13 +29,16 @@ io.sockets.on('connection', socket => {
   let room = '';
   let broadcaster_id = '';
   let viewr_id = ''
+  let fee = 0;
+  let payment = 0;
+  let interval = 0;
   // sending to all clients in the room (channel) except sender
   socket.on('message', message => {
     console.log("messgae",message)
     socket.broadcast.to(room).emit('message', message)
   });
-  socket.on('find', () => {
-    console.log("find")
+  socket.on('find', (stateObj) => {
+    console.log("find",stateObj,fee,interval,payment)
     const url = socket.request.headers.referer.split('/');
     room = url[url.length - 1];
     const sr = io.sockets.adapter.rooms[room];
@@ -44,9 +47,12 @@ io.sockets.on('connection', socket => {
       socket.join(room);
       socket.emit('create');
       broadcaster_id = socket.id;
-    } else if (sr.length === 1) {
-      socket.emit('join');
+      fee = stateObj.fee;
+      interval = stateObj.interval;
+    } else if (sr.length === 1 && viewr_id == '') {
+      socket.emit('join',{fee,interval});
       viewr_id = socket.id;
+      payment = stateObj.payment
     } else { // max two clients
       socket.emit('full', room);
     }
@@ -62,10 +68,11 @@ io.sockets.on('connection', socket => {
 
   socket.on('addr_b', data => {
     
-    let {addr_b , sid} = data
-    console.log("addr_b",addr_b,sid,data)
+    let {addr_b , sid } = data;
+    fee = data.fee;
+    interval = data.interval;
+    console.log("addr_b",addr_b,sid,fee,data)
     data.bsid = socket.id;
-
     // sending to all clients in the room (channel) except sender
     io.to(sid).emit('addr_b',data)
     ///socket.broadcast.to(room).emit('addr_b', data);
@@ -82,13 +89,16 @@ io.sockets.on('connection', socket => {
   socket.on('accept', id => {
     console.log("accept",id)
     io.sockets.connected[id].join(room);
+    const ret = {fee , interval};
     // sending to all clients in 'game' room(channel), include sender
-    io.in(room).emit('bridge');
+    io.in(room).emit('bridge',ret);
   });
 
   socket.on('reject', () => {
     console.log("reject")
-    socket.emit('full')
+    socket.emit('hangup')
+    //socket.emit('full')
+    viewr_id = ''
   });
   
   socket.on('leave', () => {
@@ -96,23 +106,14 @@ io.sockets.on('connection', socket => {
     // sending to all clients in the room (channel) except sender
     socket.broadcast.to(room).emit('hangup');
     if (socket.id == broadcaster_id) {
-      viewr_id && io.sockets.connected[viewr_id].leave(room);
+      (viewr_id > '') && io.sockets.connected[viewr_id].leave(room);
       console.log("VIEWR_ID_1",viewr_id);
+      viewr_id = ''
     }else {
       socket.leave(room);
     }
     
   });
-
-  socket.on('end', () => {
-    console.log("end")
-    // sending to all clients in the room (channel) except sender
-    socket.broadcast.to(room).emit('hangup');
-    viewr_id &&  io.sockets.connected[viewr_id].leave(room);
-    console.log("VIEWR_ID_2",viewr_id);
-    socket.leave(room);
-  });
-
 });
 
 
