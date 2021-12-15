@@ -1,12 +1,40 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { PropTypes } from 'prop-types';
 import { Link } from 'react-router-dom';
 import ToggleFullScreen from './ToggleFullScreen';
+import store from '../store'
+
+const Timer = ({ minutes }) => {
+  // initialize timeLeft with the seconds prop
+  const [timeLeft, setTimeLeft] = useState(minutes * 60);
+
+  useEffect(() => {
+    // exit early when we reach 0
+    if (!timeLeft) return;
+
+    // save intervalId to clear the interval when the
+    // component re-renders
+    const intervalId = setInterval(() => {
+      setTimeLeft(timeLeft - 1);
+    }, 1000);
+
+    // clear interval on re-render to avoid memory leaks
+    return () => clearInterval(intervalId);
+    // add timeLeft as a dependency to re-rerun the effect
+    // when we update it
+  }, [timeLeft]);
+
+  return (
+    <div>
+      <h1>{parseInt(timeLeft/60)} : {timeLeft%60}</h1>
+    </div>
+  );
+};
 
 const Communication = props =>
   <div className="auth">
     <div className="media-controls">
-      <Link className="call-exit-button" to="/">
+      <Link className="call-exit-button" to="/" onClick={props.handleHangup}>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36"  className="svg">
           <path d="M30 16.5h-18.26l8.38-8.38-2.12-2.12-12 12 12 12 2.12-2.12-8.38-8.38h18.26v-3z" fill="white"/>
         </svg>
@@ -34,17 +62,19 @@ const Communication = props =>
           <path d="M24 18c-3.21 0-6.3.5-9.2 1.44v6.21c0 .79-.46 1.47-1.12 1.8-1.95.98-3.74 2.23-5.33 3.7-.36.35-.85.57-1.4.57-.55 0-1.05-.22-1.41-.59L.59 26.18c-.37-.37-.59-.87-.59-1.42 0-.55.22-1.05.59-1.42C6.68 17.55 14.93 14 24 14s17.32 3.55 23.41 9.34c.37.36.59.87.59 1.42 0 .55-.22 1.05-.59 1.41l-4.95 4.95c-.36.36-.86.59-1.41.59-.54 0-1.04-.22-1.4-.57-1.59-1.47-3.38-2.72-5.33-3.7-.66-.33-1.12-1.01-1.12-1.8v-6.21C30.3 18.5 27.21 18 24 18z" fill="white"></path>
         </svg>
       </button>
+      {props.minutes > 0 && <Timer minutes={props.minutes} ></Timer>}
     </div>
     <div className="request-access">
-      <p><span className="you-left">You hung up.&nbsp;</span>Send an invitation to join the room.</p>
+      <p><span className="you-left">You hung up.&nbsp;</span>Send an invitation to join the room. {props.sid}</p>
       <form onSubmit={props.send}>
         <input type="text" autoFocus onChange={props.handleInput} data-ref="message"  maxLength="30" required placeholder="Hi, I'm John Doe." />
         <button className="primary-button">Send</button>
       </form>
     </div>
     <div className="grant-access">
-      <p>A peer has sent you a message to join the room:</p>
-      <div>{props.message}</div>
+      <p>A Viewr Wants to Chat:</p>
+      <div>Message: {props.message}</div>
+      <div>User Approved Payment of: {props.payment} : {store.getState().payment}  PPC tokens</div>
       <button onClick={props.handleInvitation} data-ref="reject" className="primary-button">Reject</button>
       <button onClick={props.handleInvitation} data-ref="accept" className="primary-button">Accept</button>
     </div>
@@ -53,13 +83,14 @@ const Communication = props =>
       <Link  className="primary-button" to="/">OK</Link>
     </div>
     <div className="waiting">
-      <p><span>Waiting for someone to join this room:&nbsp;</span><a href={window.location.href}>{window.location.href}</a><br/>
+      <p><span>Waiting for someone to join this room:&nbsp;</span><a href={window.location.href}>{window.location.href}</a>  Chat ID: {props.sid}<br/>
       <span className="remote-left">The remote side hung up.</span></p>
     </div>
   </div>
 
 Communication.propTypes = {
   message: PropTypes.string.isRequired,
+  sid: PropTypes.string.isRequired,
   audio: PropTypes.bool.isRequired,
   video: PropTypes.bool.isRequired,
   toggleVideo: PropTypes.func.isRequired,
@@ -67,7 +98,7 @@ Communication.propTypes = {
   send: PropTypes.func.isRequired,
   handleHangup: PropTypes.func.isRequired,
   handleInput: PropTypes.func.isRequired,
-  handleInvitation: PropTypes.func.isRequired
+  handleInvitation: PropTypes.func.isRequired,
 };
 
 export default Communication;

@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { PropTypes } from 'prop-types';
+import store from '../store'
+import { Redirect } from 'react-router-dom';
 
 class MediaBridge extends Component {
   constructor(props) {
@@ -24,6 +26,7 @@ class MediaBridge extends Component {
       .then(stream => this.localVideo.srcObject = this.localStream = stream);
     this.props.socket.on('message', this.onMessage);
     this.props.socket.on('hangup', this.onRemoteHangup);
+    this.props.socket.on('disconnect', this.onRemoteHangup);
   }
   componentWillUnmount() {
     this.props.media(null);
@@ -33,8 +36,14 @@ class MediaBridge extends Component {
     this.props.socket.emit('leave');
   }
   onRemoteHangup() {
-    this.setState({user: 'host', bridge: 'host-hangup'});
+    const owner = store.getState().owner;
+    console.log("OWNER onRemoteHangup",owner)
+    this.setState({bridge: 'host-hangup',  minutes: 0});
+    if(!owner){
+      window.history.back()
+    }
   }
+
   onMessage(message) {
       if (message.type === 'offer') {
             // set remote description and answer
@@ -67,6 +76,7 @@ class MediaBridge extends Component {
       };
   }
   setDescription(offer) {
+    console.log("setDesc",offer)
     return this.pc.setLocalDescription(offer);
   }
   // send the offer to a server to be forwarded to the other peer
@@ -74,8 +84,15 @@ class MediaBridge extends Component {
     this.props.socket.send(this.pc.localDescription);
   }
   hangup() {
-    this.setState({user: 'guest', bridge: 'guest-hangup'});
-    this.pc.close();
+    const owner = store.getState().owner;
+    console.log("OWNER hangup",owner)
+    if(owner) {
+      this.setState({bridge: 'host-hangup'})
+    } else {
+      this.setState({bridge: 'full'})
+      this.pc.close()
+      window.history.back()
+    }  
     this.props.socket.emit('leave');
   }
   handleError(e) {
@@ -91,6 +108,7 @@ class MediaBridge extends Component {
         .then(this.setDescription)
         .then(this.sendDescription)
         .catch(this.handleError); // An error occurred, so handle the failure to connect
+        
     }
     // set up the peer connection
     // this is one of Google's public STUN servers
