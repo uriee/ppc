@@ -16,7 +16,7 @@ input:focus,
 button:focus {
     outline:0;
 }
-input[type=text] {
+input {
     border: none;
     border-bottom: solid 2px #4c4c4f;
     font-size: 1em;
@@ -208,3 +208,52 @@ input[type=text] {
 .established + .auth .hangup-button {
     display: flex;
 }
+
+.ibox {
+    height: 300px;
+    position: relative;
+  }
+
+.react-switch-checkbox {
+    height: 0;
+    width: 0;
+    visibility: hidden;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .react-switch-label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    width: 50%;
+    height: 30px;
+    background: #8F67cF;
+    border-radius: 100px;
+    position: relative;
+    transition: background-color 1s;
+  }
+  
+  .react-switch-label .react-switch-button {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 40px;
+    height: 26px;
+    border-radius: 45px;
+    transition: 1s;
+    background: #fff;
+    box-shadow: 0 0 2px 0 rgba(10, 10, 10, 0.29);
+  }
+  
+  .react-switch-checkbox:checked + .react-switch-label .react-switch-button {
+    left: calc(100% - 2px);
+    transform: translateX(-100%);
+  }
+  
+  .react-switch-label:active .react-switch-button {
+    width: 60px;
+  }
