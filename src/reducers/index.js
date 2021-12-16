@@ -9,6 +9,7 @@ import paymentReducer from './payment-reducer';
 import chatidReducer from './chatid-reducer';
 import ownerReducer from './owner-reducer';
 import tokenReducer from './token-reducer';
+import isBroadcasterReducer from './isBroadcaster-reducer';
 // Combine Reducers
 const reducers = combineReducers({
   rooms: roomReducer,
@@ -19,6 +20,7 @@ const reducers = combineReducers({
   payment: paymentReducer,
   chatid: chatidReducer,
   owner: ownerReducer,
-  token: tokenReducer
+  token: tokenReducer,
+  isBroadcaster: isBroadcasterReducer
 });
 export default reducers;

@@ -22,8 +22,8 @@ input {
     font-size: 1em;
     background-color: transparent;
     color: #fff;
-    padding: .4em 0;
-    margin: 2ex 0;
+    padding: .1em 0;
+    margin: 0.5ex 0;
     width: 100%;
     max-width: 18em;
     display: block;
@@ -210,8 +210,9 @@ input {
 }
 
 .ibox {
-    height: 300px;
+    height: 200px;
     position: relative;
+    margin-top: 20px
   }
 
 .react-switch-checkbox {

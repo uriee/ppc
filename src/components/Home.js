@@ -13,6 +13,7 @@ const Switch = ({ isOn, handleToggle, onColor }) => {
         className="react-switch-checkbox"
         id={`react-switch-new`}
         type="checkbox"
+        style={{marginTop: '30px'}}
       />
       <label
         style={{ background: isOn && onColor }}
@@ -30,7 +31,7 @@ const Home = (props) => {
   const [fee, updateFee] = useState(props.fee);
   const [payment, updatePayment] = useState(props.payment);
   const [chatID, updateChatID] = useState('');  
-  const [isBroadcaster, updateIsBroadcaster] = useState(false);
+  const [isBroadcaster, updateIsBroadcaster] = useState(props.isBroadcaster);
 
   function handleIntervalChange(e)  {
     store.dispatch({ type: 'SET_INTERVAL', interval:  e.target.value})
@@ -53,33 +54,38 @@ const Home = (props) => {
   }
 
   function handleRoleChange(e) {
+    store.dispatch({ type: 'SET_ISBROADCASTER', isBroadcaster:  !isBroadcaster})
     updateIsBroadcaster(!isBroadcaster);
   }
 
   return (
     <div className="home">
         <div>
-          <h1 itemProp="headline">Pay Per Interaction</h1>
-          <label>
+          <h1 itemProp="headline">Pay Per Chat</h1>
+          <h1 itemProp="headline">using the PPC token</h1>
+
+          <p>Please enter a room name.</p>
+          <input type="text" name="room" value={ props.roomId } onChange={props.handleIdChange} pattern="^\w+$" maxLength="10" required autoFocus title="Room name should only contain letters or numbers."/>
+
+          <p>
             <Switch isOn={isBroadcaster} onColor="#cF678F"  handleToggle={handleRoleChange}/>
-          </label>
+          </p>
           {isBroadcaster ? (
             <div className="ibox">
-              <p>Payment cycle in minutes.</p>
-              <input type="number" name="interval" value={interval} onChange={handleIntervalChange} pattern="^\d+$" maxLength="3" required autoFocus title="Length of the payment cycle in minutes (numbers only)."/> 
-              <p>Each cycle fee in PPI Token.</p>
-              <input type="number" name="fee" value={fee} onChange={handleFeeChange} pattern="^\d+$" maxLength="10" required autoFocus title="Payment in PPI tokens per interval."/>             
+              <span>Duration of each Session</span>
+              <input type="number" name="interval" value={interval} onChange={handleIntervalChange} pattern="^\d+$" maxLength="3" required autoFocus title="The durationof the session in minutes."/> 
+              <span>Cost of session in PPI Token.</span>
+              <input type="number" name="fee" value={fee} onChange={handleFeeChange} pattern="^\d+$" maxLength="10" required autoFocus title="Payment in PPI tokens per Session."/>             
             </div>
             ) : (
             <div className="ibox">
-              <p>I'm Willing to Pay</p>              
-              <input type="number" name="first" value={payment} onChange={handlePaymentChange} pattern="^\d+$" maxLength="10" required autoFocus title="sweet tokens"/>               
-              <p>Ensure authenticity with chat id</p>              
+              <span>I'm Willing to Pay</span> <br/>             
+              <span>(no lower then the requested fee)</span>
+              <input type="number" name="first" value={payment} onChange={handlePaymentChange} pattern="^\d+$" maxLength="10" required autoFocus title="tokens"/>               
+              <span>Ensure authenticity with chat id</span>              
               <input type="text" name="chatid" value={chatID} onChange={handleChatIDChange} maxLength="50" autoFocus title="Ensure authenticity with chat id"/>               
             </div>
             )}
-          <p>Please enter a room name.</p>
-          <input type="text" name="room" value={ props.roomId } onChange={props.handleIdChange} pattern="^\w+$" maxLength="10" required autoFocus title="Room name should only contain letters or numbers."/>
 
           <Link className="primary-button" to={ '/r/' + props.roomId }>Start/Join</Link>
           { props.rooms.length !== 0 && <div>Recently used rooms:</div> }
@@ -108,6 +114,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     fee: state.fee,
     interval: state.interval,
     payment: state.payment,
+    isBroadcaster: state.isBroadcaster
   }
 )};
 
