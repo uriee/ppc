@@ -90,7 +90,7 @@ const Communication = props =>
 
 Communication.propTypes = {
   message: PropTypes.string.isRequired,
-  sid: PropTypes.string.isRequired,
+  //sid: PropTypes.string.isRequired,
   audio: PropTypes.bool.isRequired,
   video: PropTypes.bool.isRequired,
   toggleVideo: PropTypes.func.isRequired,

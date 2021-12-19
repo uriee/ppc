@@ -8,6 +8,9 @@ import { connect } from 'react-redux'
 import getBlockchain from '../../ethereum.js';
 import regeneratorRuntime, { async } from "regenerator-runtime"
 
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 class CommunicationContainer extends React.Component {
   constructor(props) {
     super(props);
@@ -91,16 +94,21 @@ class CommunicationContainer extends React.Component {
       this.setState({ message, sid });
     });
 
-    socket.on('addr_v', ({ addr_v, sid, payment }) => {
+    socket.on('addr_v', ({ addr_v, sid}) => {
       const state = store.getState();
-      console.log("addr_v",addr_v,sid, state.fee)
+      console.log("addr_v",addr_v,sid, socket.id);
       this.setState({ addr_v: addr_v.addr_v, payment: addr_v.payment });
 
-      if (parseInt(state.fee) >= parseInt(addr_v.payment)) {
-        this.props.socket.emit('reject', this.state.sid)
+      if (parseInt(state.fee) > parseInt(addr_v.payment)) {
+        this.props.socket.emit('reject', this.state.sid, "You need to pay more.")
         return;
       }
-
+/*
+      if(addr_v.chatID > '' && socket.id != addr_v.chatID){
+        this.props.socket.emit('reject', this.state.sid, "Wrong chat id, probably a scam.")
+        return;
+      }
+*/
       store.dispatch({ type: 'SET_PAYMENT', payment:  addr_v.payment})
       let addr_b = this.signerAddress;
       let ret = {addr_b, sid ,fee: state.fee, interval: state.interval }
@@ -143,7 +151,8 @@ class CommunicationContainer extends React.Component {
     if(this.signerAddress) {
       let obj = {
         addr_v: this.signerAddress,
-        payment : this.props.payment
+        payment : this.props.payment,
+        chatID: store.getState().chatID
       }
       this.props.socket.emit('addr_v', obj);
       this.hideAuth();
@@ -155,6 +164,14 @@ class CommunicationContainer extends React.Component {
     console.log("SEND",addr_b, this.props.payment + '000000000',this.ppiToken) 
     //Set Allowance
     const ret = await this.ppiToken.approve(addr_b, this.props.payment + '000000000')
+    toast.promise(
+      ret.wait(),
+      {
+        pending: 'Sending token to PPC',
+        success: 'Tokens sent 👌',
+        error: 'Error 🤯'
+      }
+    )
     const confirmation = await ret.wait()
     console.log("SEND 3",confirmation)
     if (confirmation.status === 1) {
@@ -166,17 +183,25 @@ class CommunicationContainer extends React.Component {
   Accept = async () => {
     console.log("Accept",this.state.addr_v, this.signerAddress, this.state.payment + '000000000',store.fee,store.getState().fee)
     if (this.state.payment < store.fee) {
-      this.props.socket.emit('reject', this.state.sid);
+      this.props.socket.emit('reject', this.state.sid, "You need to pay more.");
       return;
     }
     const ret = await this.ppiToken.transferFrom(this.state.addr_v, this.signerAddress,  this.state.payment + '000000000')
+    toast.promise(
+      ret.wait(),
+      {
+        pending: 'Getting the preciouse tokens',
+        success: 'Tokens recieved 👌',
+        error: 'Error 🤯'
+      }
+    )
     const accept =  await ret.wait()
     console.log("ACCEPT:",accept)
     if (accept.status == 1) {
       this.props.socket.emit('accept', this.state.sid);
       this.setState({ minutes: store.getState().interval });
     }else{
-      this.props.socket.emit('reject', this.state.sid);
+      this.props.socket.emit('reject', this.state.sid, "You've been rejected by the Broadcaster.");
       this.hideAuth();
     }
   }
@@ -187,7 +212,7 @@ class CommunicationContainer extends React.Component {
     if (e.target.dataset.ref == 'accept') {
       this.Accept()
     }else{
-      this.props.socket.emit('reject', this.state.sid);
+      this.props.socket.emit('reject', this.state.sid, "You've been rejected by the Broadcaster.");
     }
     this.hideAuth();  
   }
@@ -210,14 +235,14 @@ class CommunicationContainer extends React.Component {
     this.setState({ minutes: 0 });
   }
   render(){
-    console.log("PPPPPP",this.state,this.state.id)
+    console.log("PPPPPP",this.state)
     return (
       <Communication
         {...this.state}
         toggleVideo={this.toggleVideo}
         toggleAudio={this.toggleAudio}
         send={this.send}
-        sid={this.state.id || 'empty'}
+        sid={this.state ? this.state.id : ''}
         minutes={this.state.minutes}
         handleHangup={this.handleHangup}
         handleInput={this.handleInput}

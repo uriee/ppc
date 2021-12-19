@@ -103,9 +103,9 @@ io.sockets.on('connection', socket => {
     io.in(room).emit('bridge',ret);
   });
 
-  socket.on('reject', () => {
+  socket.on('reject', (sid,message) => {
     console.log("reject")
-    socket.emit('hangup')
+    socket.emit('hangup',message)
     //socket.emit('full')
     viewr_id = ''
   });

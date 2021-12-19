@@ -4,6 +4,9 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import store from '../store'
 
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 const Switch = ({ isOn, handleToggle, onColor }) => {
   return (
     <>
@@ -30,7 +33,7 @@ const Home = (props) => {
   const [interval, updateInterval] = useState(props.interval);
   const [fee, updateFee] = useState(props.fee);
   const [payment, updatePayment] = useState(props.payment);
-  const [chatID, updateChatID] = useState('');  
+  const [chatID, updatechatID] = useState('');  
   const [isBroadcaster, updateIsBroadcaster] = useState(props.isBroadcaster);
 
   function handleIntervalChange(e)  {
@@ -48,9 +51,9 @@ const Home = (props) => {
     store.dispatch({ type: 'SET_PAYMENT', payment:  e.target.value})
   }
 
-  function handleChatIDChange(e) {
-    updateChatID(e.target.value)
-    store.dispatch({ type: 'SET_CHATID', chatid:  e.target.value})
+  function handlechatIDChange(e) {
+    updatechatID(e.target.value)
+    store.dispatch({ type: 'SET_CHATID', chatID:  e.target.value})
   }
 
   function handleRoleChange(e) {
@@ -59,11 +62,12 @@ const Home = (props) => {
   }
 
   return (
+
     <div className="home">
         <div>
           <h1 itemProp="headline">Pay Per Chat</h1>
           <h1 itemProp="headline">using the PPC token</h1>
-
+          <ToastContainer />
           <p>Please enter a room name.</p>
           <input type="text" name="room" value={ props.roomId } onChange={props.handleIdChange} pattern="^\w+$" maxLength="10" required autoFocus title="Room name should only contain letters or numbers."/>
 
@@ -83,7 +87,7 @@ const Home = (props) => {
               <span>(no lower then the requested fee)</span>
               <input type="number" name="first" value={payment} onChange={handlePaymentChange} pattern="^\d+$" maxLength="10" required autoFocus title="tokens"/>               
               <span>Ensure authenticity with chat id</span>              
-              <input type="text" name="chatid" value={chatID} onChange={handleChatIDChange} maxLength="50" autoFocus title="Ensure authenticity with chat id"/>               
+              <input type="text" name="chatID" value={chatID} onChange={handlechatIDChange} maxLength="50" autoFocus title="Ensure authenticity with chat id"/>               
             </div>
             )}
 
@@ -92,6 +96,7 @@ const Home = (props) => {
           { props.rooms.map(room => <Link key={room} className="recent-room" to={ '/r/' + room }>{ room }</Link>) }
         </div>
     </div>
+       
     );
 }
 

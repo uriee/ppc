@@ -15,7 +15,8 @@ const persistedState = localStorage.getItem('reduxState')
 		payment : 0,
 		token: {},
 		owner: false,
-		isBroadcaster: false
+		isBroadcaster: false,
+		chatID
 	};
 const store = createStore(reducers, persistedState);
 store.subscribe(mapStoreToStorage);

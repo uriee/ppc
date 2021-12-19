@@ -6,10 +6,11 @@ import videoReducer from './video-reducer';
 import feeReducer from './fee-reducer';
 import intervalReducer from './interval-reducer';
 import paymentReducer from './payment-reducer';
-import chatidReducer from './chatid-reducer';
+import chatIDReducer from './chatid-reducer';
 import ownerReducer from './owner-reducer';
 import tokenReducer from './token-reducer';
 import isBroadcasterReducer from './isBroadcaster-reducer';
+
 // Combine Reducers
 const reducers = combineReducers({
   rooms: roomReducer,
@@ -18,9 +19,9 @@ const reducers = combineReducers({
   fee: feeReducer,
   interval: intervalReducer,
   payment: paymentReducer,
-  chatid: chatidReducer,
+  chatID: chatIDReducer,
   owner: ownerReducer,
   token: tokenReducer,
-  isBroadcaster: isBroadcasterReducer
+  isBroadcaster: isBroadcasterReducer,
 });
 export default reducers;

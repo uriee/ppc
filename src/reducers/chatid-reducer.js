@@ -1,2 +1,2 @@
-const setchatid = (state=1 , action) => (action.type === 'SET_CHATID' ? action.chatid : state);
-export default setchatid;
+const setchatID = (state='' , action) => (action.type === 'SET_CHATID' ? action.chatID : state);
+export default setchatID;

@@ -1,8 +1,8 @@
 /*
 object-assign
-@license Proprietary
+(c) Sindre Sorhus
+@license MIT
 */
-/*! https://payperchat.xyz v.1 by admin@payperchat.xyz*/
 
 /*! https://mths.be/utf8js v2.1.2 by @mathias */
 

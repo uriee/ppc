@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { PropTypes } from 'prop-types';
 import store from '../store'
 import { Redirect } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 class MediaBridge extends Component {
   constructor(props) {
@@ -154,6 +156,7 @@ class MediaBridge extends Component {
   render(){
     return (
       <div className={`media-bridge ${this.state.bridge}`}>
+        <ToastContainer autoClose={2000}/>
         <video className="remote-video" ref={(ref) => this.remoteVideo = ref} autoPlay></video>
         <video className="local-video" ref={(ref) => this.localVideo = ref} autoPlay muted></video>
       </div>
