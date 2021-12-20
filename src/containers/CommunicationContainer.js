@@ -46,10 +46,12 @@ class CommunicationContainer extends React.Component {
   full() {
     console.log("FULL", this.props.media)
     this.props.media.setState({bridge: 'full'});
+    toast("Broadcaster is accupied", { autoClose: 2000, pauseOnHover: false })
   }
 
   componentDidMount() {
     const socket = this.props.socket;
+
     this.setState({video: this.props.video, audio: this.props.audio, id: socket.id});
     const state = store.getState();
     const stateObj = {
@@ -72,6 +74,11 @@ class CommunicationContainer extends React.Component {
       props.interval && this.setState({ minutes: props.interval });
       this.props.media.init()
     });
+
+    socket.on('hangup', props => {
+      console.log("Hangup minuts = 0")
+      this.setState({ minutes: 0 });
+    });    
 
     socket.on('join', (props) => {
       // allowance
@@ -98,17 +105,18 @@ class CommunicationContainer extends React.Component {
       const state = store.getState();
       console.log("addr_v",addr_v,sid, socket.id);
       this.setState({ addr_v: addr_v.addr_v, payment: addr_v.payment });
-
+      toast(`SomeOne is considering a session for ${addr_v.payment} PPC.`, { autoClose: 2000, pauseOnHover: false })
       if (parseInt(state.fee) > parseInt(addr_v.payment)) {
         this.props.socket.emit('reject', this.state.sid, "You need to pay more.")
         return;
       }
-/*
-      if(addr_v.chatID > '' && socket.id != addr_v.chatID){
-        this.props.socket.emit('reject', this.state.sid, "Wrong chat id, probably a scam.")
-        return;
+
+      if(addr_v.chatID != '' && socket.id != addr_v.chatID){
+        console.log("wrong chat id ",addr_v.chatID, socket.id)
+        //this.props.socket.emit('reject', this.state.sid, "Wrong chat id, probably a scam.")
+        //return;
       }
-*/
+
       store.dispatch({ type: 'SET_PAYMENT', payment:  addr_v.payment})
       let addr_b = this.signerAddress;
       let ret = {addr_b, sid ,fee: state.fee, interval: state.interval }
@@ -121,6 +129,7 @@ class CommunicationContainer extends React.Component {
       //save addr on viewr_add state variable
       this.setState({addr_b});
       this.approve(addr_b);
+      toast("Broadcaster is online and free to chat", { autoClose: 2000, pauseOnHover: false })
     });
 
     socket.emit('find', stateObj);
@@ -169,7 +178,8 @@ class CommunicationContainer extends React.Component {
       {
         pending: 'Sending token to PPC',
         success: 'Tokens sent 👌',
-        error: 'Error 🤯'
+        error: 'Error 🤯',
+        autoClose: 2000, pauseOnHover: false
       }
     )
     const confirmation = await ret.wait()
@@ -192,7 +202,8 @@ class CommunicationContainer extends React.Component {
       {
         pending: 'Getting the preciouse tokens',
         success: 'Tokens recieved 👌',
-        error: 'Error 🤯'
+        error: 'Error 🤯',
+        autoClose: 2000, pauseOnHover: false 
       }
     )
     const accept =  await ret.wait()

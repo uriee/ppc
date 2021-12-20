@@ -174,6 +174,11 @@ input {
     left: 0;
     right: 0;
 }
+.timer {
+    position:relative;
+    top:-10px; 
+    justify-content: center;
+}
 .svg {
     width: 1.4em;
 }

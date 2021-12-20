@@ -2,6 +2,10 @@ import React, { Component } from 'react';
 import { PropTypes } from 'prop-types';
 import store from '../store'
 import { Redirect } from 'react-router-dom';
+
+import getBlockchain from '../../ethereum.js';
+import regeneratorRuntime, { async } from "regenerator-runtime"
+
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -43,6 +47,8 @@ class MediaBridge extends Component {
     this.setState({bridge: 'host-hangup',  minutes: 0});
     if(!owner){
       window.history.back()
+    }else{
+      toast("Viewer Hangup", { autoClose: 2000, pauseOnHover: false })
     }
   }
 
