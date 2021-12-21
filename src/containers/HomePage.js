@@ -5,7 +5,7 @@ import Home from '../components/Home';
 class HomePage extends Component {
   constructor(props) {
     super(props);
-    this.defaultRoomId = String(new Date() - new Date().setHours(0, 0, 0, 0));
+    this.defaultRoomId = '';
     this.state = { roomId: this.defaultRoomId };
     this.handleIdChange = this.handleIdChange.bind(this);  
   }
