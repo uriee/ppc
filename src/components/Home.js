@@ -33,8 +33,16 @@ const Home = (props) => {
   const [interval, updateInterval] = useState(props.interval);
   const [fee, updateFee] = useState(props.fee);
   const [payment, updatePayment] = useState(props.payment);
-  const [chatID, updatechatID] = useState('');  
+  const [chatID, updatechatID] = useState(props.chatID);  
+  const [roomID, updateroomID] = useState(props.roomID);   
   const [isBroadcaster, updateIsBroadcaster] = useState(props.isBroadcaster);
+
+
+  function handleroomIDChange(e) {
+    updateroomID(e.target.value)
+    store.dispatch({ type: 'SET_ROOMID', roomID:  e.target.value})
+  }
+
 
   function handleIntervalChange(e)  {
     store.dispatch({ type: 'SET_INTERVAL', interval:  e.target.value})
@@ -87,14 +95,14 @@ const Home = (props) => {
           <form className="contact-form">
 
             <div className="control-material is-secondary">      
-                <input type="text" name="room" value={ props.roomId } onChange={props.handleIdChange} pattern="^\w+$" maxLength="10" required autoFocus title="Room name should only contain letters or numbers."/>
+                <input type="text" name="room" value={ roomID } onChange={handleroomIDChange} pattern="^\w+$" maxLength="10" required autoFocus title="Room name should only contain letters or numbers."/>
                 <span className="material-highlight"></span>
                 <span className="bar"></span>
                 <label>Room Name.</label>
             </div>
 
             <p  >
-              <Switch  isOn={isBroadcaster} onColor="#cF678F"  handleToggle={handleRoleChange}/>
+              <Switch  isOn={isBroadcaster} onColor="#3f00fc"  handleToggle={handleRoleChange}/>
             </p>
             
             {isBroadcaster ? (
@@ -131,7 +139,7 @@ const Home = (props) => {
               </div>                                   
               )}  
             <div className="has-text-centered">
-                <Link className="button is-button k-button k-primary raised has-gradient is-fat is-bold is-submit" to={ '/r/' + props.roomId }>
+                <Link className="button is-button k-button k-primary raised has-gradient is-fat is-bold is-submit" to={ '/r/' + roomID }>
                     <span className="text">Start/Join</span>
                     <span className="front-gradient"></span>
                 </Link>
@@ -159,6 +167,8 @@ const mapDispatchToProps = (dispatch, ownProps) => {
 
   return (
   {
+    roomID: state.roomID,
+    chatID: state.chatID,
     fee: state.fee,
     interval: state.interval,
     payment: state.payment,

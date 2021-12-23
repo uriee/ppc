@@ -98,8 +98,7 @@ io.sockets.on('connection', socket => {
   socket.on('claim', (data) => {
     console.log("claim",data)
     // sending to all clients in the room (channel) except sender
-    socket.broadcast.to(room).emit('claim', data);
-    socket.emit('claim', data);
+    io.in(room).emit('claim',data)
   });
 
   socket.on('accept', id => {

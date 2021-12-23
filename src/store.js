@@ -8,6 +8,7 @@ const persistedState = localStorage.getItem('reduxState')
 	? JSON.parse(localStorage.getItem('reduxState'))
 	: {
 		rooms: [],
+		roomID: '',
 		video: true,
 		audio: true,
 		fee: 0,

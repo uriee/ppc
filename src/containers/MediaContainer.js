@@ -27,6 +27,14 @@ class MediaBridge extends Component {
     this.setDescription = this.setDescription.bind(this);
   }
   componentDidMount() {
+    const pageloader = document.getElementById('pageloader');
+    const infraloader = document.getElementById('infraloader');
+    pageloader.classList.toggle('is-active');
+    var pageloaderTimeout = setTimeout(function () {
+        infraloader.classList.remove('is-active');
+        pageloader.classList.toggle('is-active');
+        clearTimeout(pageloaderTimeout);
+    }, 1200);     
     this.props.media(this);
     this.props.getUserMedia
       .then(stream => this.localVideo.srcObject = this.localStream = stream);
@@ -162,6 +170,8 @@ class MediaBridge extends Component {
   render(){
     return (
       <div className={`media-bridge ${this.state.bridge}`}>
+        <div id="pageloader" class="pageloader is-left-to-right is-theme"></div>
+        <div id="infraloader" class="infraloader is-active"></div>        
         <ToastContainer autoClose={2000}/>
         <video className="remote-video" ref={(ref) => this.remoteVideo = ref} autoPlay></video>
         <video className="local-video" ref={(ref) => this.localVideo = ref} autoPlay muted></video>
