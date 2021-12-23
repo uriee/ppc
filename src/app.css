@@ -1,3 +1,6 @@
+body{
+    background: url(../img/bg/gradient-left-darker.png) repeat-y top left, url(../img/bg/gradient-right-darker.png) repeat-y top right, #1c004c
+}
 body,
 input,
 button {
@@ -167,6 +170,8 @@ input {
     -moz-box-shadow: 1px 1px 5px 0 rgba(0,0,0,.5);
     box-shadow: 1px 1px 5px 0 rgba(0,0,0,.5);
 }
+
+
 .media-controls {
     display: flex;
     margin: 2ex 0;
@@ -250,7 +255,7 @@ input {
     width: 40px;
     height: 26px;
     border-radius: 45px;
-    transition: 1s;
+    transition: 0.3s;
     background: #fff;
     box-shadow: 0 0 2px 0 rgba(10, 10, 10, 0.29);
   }

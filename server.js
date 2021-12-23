@@ -95,6 +95,13 @@ io.sockets.on('connection', socket => {
     socket.broadcast.to(room).emit('approve', data);
   });
 
+  socket.on('claim', (data) => {
+    console.log("claim",data)
+    // sending to all clients in the room (channel) except sender
+    socket.broadcast.to(room).emit('claim', data);
+    socket.emit('claim', data);
+  });
+
   socket.on('accept', id => {
     console.log("accept",id)
     io.sockets.connected[id].join(room);

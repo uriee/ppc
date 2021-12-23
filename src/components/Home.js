@@ -16,7 +16,7 @@ const Switch = ({ isOn, handleToggle, onColor }) => {
         className="react-switch-checkbox"
         id={`react-switch-new`}
         type="checkbox"
-        style={{marginTop: '30px'}}
+       // style={{marginTop: '30px',marginBottom: '30px'}}
       />
       <label
         style={{ background: isOn && onColor }}
@@ -61,39 +61,82 @@ const Home = (props) => {
     updateIsBroadcaster(!isBroadcaster);
   }
 
+
+  useEffect(() => {
+    const pageloader = document.getElementById('pageloader');
+    const infraloader = document.getElementById('infraloader');
+    pageloader.classList.toggle('is-active');
+    var pageloaderTimeout = setTimeout(function () {
+        infraloader.classList.remove('is-active');
+        pageloader.classList.toggle('is-active');
+        clearTimeout(pageloaderTimeout);
+    }, 1200); 
+  }, []);
+ 
+
   return (
-
     <div className="home">
+          <div id="pageloader" class="pageloader is-left-to-right is-theme"></div>
+          <div id="infraloader" class="infraloader is-active"></div>
         <div>
-          <h1 itemProp="headline">Pay Per Chat</h1>
-          <h1 itemProp="headline">using the PPC token</h1>
+          <h1 className="title is-1 is-light is-semibold is-spaced main-title">Pay Per Chat</h1>
+          <h1 className="subtitle is-5 is-light is-thin">using the PPC token</h1>
           <ToastContainer />
-          <p>Please enter a room name.</p>
-          <input type="text" name="room" value={ props.roomId } onChange={props.handleIdChange} pattern="^\w+$" maxLength="10" required autoFocus title="Room name should only contain letters or numbers."/>
 
-          <p>
-            <Switch isOn={isBroadcaster} onColor="#cF678F"  handleToggle={handleRoleChange}/>
-          </p>
-          {isBroadcaster ? (
-            <div className="ibox">
-              <span>Duration of each Session</span>
-              <input type="number" name="interval" value={interval} onChange={handleIntervalChange} pattern="^\d+$" maxLength="3" required autoFocus title="The durationof the session in minutes."/> 
-              <span>Cost of session in PPI Token.</span>
-              <input type="number" name="fee" value={fee} onChange={handleFeeChange} pattern="^\d+$" maxLength="10" required autoFocus title="Payment in PPI tokens per Session."/>             
-            </div>
-            ) : (
-            <div className="ibox">
-              <span>I'm Willing to Pay</span> <br/>             
-              <span>(no lower then the requested fee)</span>
-              <input type="number" name="first" value={payment} onChange={handlePaymentChange} pattern="^\d+$" maxLength="10" required autoFocus title="tokens"/>               
-              <span>Ensure authenticity with chat id</span>              
-              <input type="text" name="chatID" value={chatID} onChange={handlechatIDChange} maxLength="50" autoFocus title="Ensure authenticity with chat id"/>               
-            </div>
-            )}
 
-          <Link className="primary-button" to={ '/r/' + props.roomId }>Start/Join</Link>
-          { props.rooms.length !== 0 && <div>Recently used rooms:</div> }
-          { props.rooms.map(room => <Link key={room} className="recent-room" to={ '/r/' + room }>{ room }</Link>) }
+          <form className="contact-form">
+
+            <div className="control-material is-secondary">      
+                <input type="text" name="room" value={ props.roomId } onChange={props.handleIdChange} pattern="^\w+$" maxLength="10" required autoFocus title="Room name should only contain letters or numbers."/>
+                <span className="material-highlight"></span>
+                <span className="bar"></span>
+                <label>Room Name.</label>
+            </div>
+
+            <p  >
+              <Switch  isOn={isBroadcaster} onColor="#cF678F"  handleToggle={handleRoleChange}/>
+            </p>
+            
+            {isBroadcaster ? (
+              <div>
+              <div className="control-material is-secondary">
+                  <input type="number" name="interval" value={interval} onChange={handleIntervalChange} pattern="^\d+$" maxLength="3" required autoFocus title="The durationof the session in minutes."/>       
+                  <span className="material-highlight"></span>
+                  <span className="bar"></span>
+                  <label>Duration of each Session</label>
+              </div>
+
+              <div className="control-material is-secondary"> 
+                  <input type="number" name="fee" value={fee} onChange={handleFeeChange} pattern="^\d+$" maxLength="10" required autoFocus title="Payment in PPI tokens per Session."/> 
+                  <span className="material-highlight"></span>
+                  <span className="bar"></span>
+                  <label>Cost of session in PPI Token. </label>
+              </div>
+              </div>
+              ) : (
+              <div>
+              <div className="control-material is-secondary">      
+                  <input type="number" name="payment" value={payment} onChange={handlePaymentChange} pattern="^\d+$" maxLength="10" required autoFocus title="tokens"/>
+                  <span className="material-highlight"></span>
+                  <span className="bar"></span>
+                  <label>I'm Willing to Pay</label>
+              </div>
+
+              <div className="control-material is-secondary">
+              <input type="text" name="chatID" value={chatID} onChange={handlechatIDChange} maxLength="50" autoFocus title="Ensure authenticity with chat id"/>
+                  <span className="material-highlight"></span>
+                  <span className="bar"></span>
+                  <label>Ensure authenticity with chat id </label>
+              </div> 
+              </div>                                   
+              )}  
+            <div className="has-text-centered">
+                <Link className="button is-button k-button k-primary raised has-gradient is-fat is-bold is-submit" to={ '/r/' + props.roomId }>
+                    <span className="text">Start/Join</span>
+                    <span className="front-gradient"></span>
+                </Link>
+            </div>
+          </form>
         </div>
     </div>
        

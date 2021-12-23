@@ -16,6 +16,7 @@ class HomePage extends Component {
   render(){
     return (
       <Home
+        className='dark-wrapper'
         defaultRoomId={this.defaultRoomId}
         roomId={this.state.roomId}
         handleIdChange={this.handleIdChange}

@@ -132,6 +132,12 @@ class CommunicationContainer extends React.Component {
       toast("Broadcaster is online and free to chat", { autoClose: 2000, pauseOnHover: false })
     });
 
+    socket.on('claim', (props) => {
+      // allowance
+      console.log("claim:",props);
+      toast("Broadcaster is claiming tokens", { autoClose: 2000, pauseOnHover: false })
+    });    
+
     socket.emit('find', stateObj);
     console.log("emitted find")
     this.props.getUserMedia
@@ -197,6 +203,7 @@ class CommunicationContainer extends React.Component {
       return;
     }
     const ret = await this.ppiToken.transferFrom(this.state.addr_v, this.signerAddress,  this.state.payment + '000000000')
+    this.props.socket.emit('claim',this.state);
     toast.promise(
       ret.wait(),
       {
