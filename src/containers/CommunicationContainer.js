@@ -34,7 +34,7 @@ class CommunicationContainer extends React.Component {
     this.send = this.send.bind(this);
 
     this.signerAddress = null
-    this.ppiToken = null
+    this.ppcToken = null
 
   }
 
@@ -81,17 +81,17 @@ class CommunicationContainer extends React.Component {
     });    
 
     socket.on('join', (props) => {
-      // allowance
       console.log("FEE INTERVAL:",props);
       this.props.media.setState({user: 'guest', bridge: 'join'})
       store.dispatch({ type: 'SET_OWNER', owner: false})
       this.setState({id :props.sid})
     });
 
-    socket.on('disconnect', (props) => {
-      // allowance
+    socket.on('disconnect', async (props) => {
       console.log("disconnect:",props);
       this.props.media.setState({bridge: 'full'});
+      toast.error(`Diconnected`)
+      await new Promise(resolve => setTimeout(resolve, 2000));
       window.history.back()
     });    
 
@@ -107,10 +107,11 @@ class CommunicationContainer extends React.Component {
       this.setState({ addr_v: addr_v.addr_v, payment: addr_v.payment });
       toast(`SomeOne is considering a session for ${addr_v.payment} PPC.`, { autoClose: 2000, pauseOnHover: false })
       if (parseInt(state.fee) > parseInt(addr_v.payment)) {
-        this.props.socket.emit('reject', this.state.sid, "You need to pay more.")
+        console.log("PARSE",parseInt(state.fee) > parseInt(addr_v.payment))
+        this.props.socket.emit('reject', sid, "You need to pay more.")
         return;
       }
-
+      console.log("PARSE PASS",parseInt(state.fee) > parseInt(addr_v.payment))
       if(addr_v.chatID != '' && socket.id != addr_v.chatID){
         console.log("wrong chat id ",addr_v.chatID, socket.id)
         //this.props.socket.emit('reject', this.state.sid, "Wrong chat id, probably a scam.")
@@ -132,11 +133,10 @@ class CommunicationContainer extends React.Component {
       toast("Broadcaster is online and free to chat", { autoClose: 2000, pauseOnHover: false })
     });
 
-    socket.on('claim', (props) => {
-      // allowance
-      console.log("claim:",props);
-      toast("Broadcaster is claiming tokens", { autoClose: 2000, pauseOnHover: false })
-    });    
+    socket.on('transfer', (props) => {
+      console.log("transfer:",props);
+      toast("Viewr is transfering tokens", { autoClose: 2000, pauseOnHover: false })
+    });      
 
     socket.emit('find', stateObj);
     console.log("emitted find")
@@ -149,11 +149,17 @@ class CommunicationContainer extends React.Component {
         });
 
     const init = async () => {
-      let { signerAddress, ppiToken } = await getBlockchain();
+      let { signerAddress, ppcToken } = await getBlockchain();
       this.signerAddress = signerAddress
-      this.ppiToken = ppiToken
+      if(!ppcToken){
+        toast.error(`No wallet Detected`)
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        window.history.back()
+      }
+      this.ppcToken = ppcToken
     };
-    !this.ppiToken && init();        
+    console.log("eee",this.ppcToken)
+    !this.ppcToken && init();        
 
   }
   handleInput(e) {
@@ -162,12 +168,13 @@ class CommunicationContainer extends React.Component {
   
   send = async(e) => {
     e.preventDefault();
-    console.log("SWAP",this.ppiToken, this.signerAddress)
+    console.log("SWAP",this.ppcToken, this.signerAddress)
     if(this.signerAddress) {
       let obj = {
         addr_v: this.signerAddress,
         payment : this.props.payment,
-        chatID: store.getState().chatID
+        chatID: store.getState().chatID,
+        roomID: store.getState().roomID,
       }
       this.props.socket.emit('addr_v', obj);
       this.hideAuth();
@@ -176,9 +183,10 @@ class CommunicationContainer extends React.Component {
 
 
   approve = async (addr_b) => {
-    console.log("SEND",addr_b, this.props.payment + '000000000',this.ppiToken) 
+    console.log("SEND",addr_b, this.props.payment + '000000000',this.ppcToken) 
     //Set Allowance
-    const ret = await this.ppiToken.approve(addr_b, this.props.payment + '000000000')
+    const ret = await this.ppcToken.approve(addr_b, this.props.payment + '000000000')
+    this.props.socket.emit('transfer',this.state);
     toast.promise(
       ret.wait(),
       {
@@ -202,8 +210,8 @@ class CommunicationContainer extends React.Component {
       this.props.socket.emit('reject', this.state.sid, "You need to pay more.");
       return;
     }
-    const ret = await this.ppiToken.transferFrom(this.state.addr_v, this.signerAddress,  this.state.payment + '000000000')
-    this.props.socket.emit('claim',this.state);
+    const ret = await this.ppcToken.transferFrom(this.state.addr_v, this.signerAddress,  this.state.payment + '000000000')
+    this.props.socket.emit('claim',this.state.sid);
     toast.promise(
       ret.wait(),
       {
@@ -247,13 +255,31 @@ class CommunicationContainer extends React.Component {
     this.setState({audio: audio});
     this.props.setAudio(audio);
   }
-  handleHangup() {
+  async handleHangup() {
     console.log("Hang up")
     this.props.media.hangup();
+    let allowance = await this.ppcToken.allowance(this.state.addr_v, this.state.addr_b)
+    console.log("allowance:",allowance,this.state.addr_v, this.state.addr_b)
+    /*
+    if(allowance) {
+      const ret = await this.ppcToken.transferFrom(this.state.addr_v, this.state.addr_b,  '0')
+      this.props.socket.emit('claim',this.state.sid);
+      toast.promise(
+        ret.wait(),
+        {
+          pending: 'Getting the preciouse tokens',
+          success: 'Tokens recieved 👌',
+          error: 'Error 🤯',
+          autoClose: 2000, pauseOnHover: false 
+        }
+      )
+      const redeem =  await ret.wait()
+      console.log("REDEEM:",redeem)        
+    }
+  */
     this.setState({ minutes: 0 });
   }
   render(){
-    console.log("PPPPPP",this.state)
     return (
       <Communication
         {...this.state}

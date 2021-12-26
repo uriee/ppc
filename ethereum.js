@@ -12,13 +12,15 @@ const getBlockchain = () => new Promise((resolve, reject) => {
             const signer = provider.getSigner();
             const signerAddress = await signer.getAddress();
 
-            const ppiToken = new Contract(
+            const ppcToken = new Contract(
                 "0xcc3c3a48780F2891ED278341d8359f96Fa4f3036",
                 PPIToken.output.abi,
                 signer
             );
 
-            resolve({signerAddress, ppiToken});
+            resolve({signerAddress, ppcToken});
+        }else{
+            resolve({signerAddress: 0 , ppcToken : 0 })
         }
     }
     xxx();

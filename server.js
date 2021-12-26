@@ -68,8 +68,19 @@ io.sockets.on('connection', socket => {
   });
 
   socket.on('addr_v', data => {
-    console.log("addr_v",data)
-    //data.sid = socket.sid;
+    console.log("addr_v",data,)
+   
+    let y = io.sockets.adapter.rooms
+    let yy = y ? y[data.roomID] : 0
+    //let yyy = yy ? Object.keys(yy.sockets[0]) : 0
+    console.log("y1:",yy)
+    console.log("y2:",yy.sockets)
+    const yyy = yy.sockets && Object.keys(yy.sockets)
+    console.log("y3:",data.chatID , yyy)
+    if ( data.chatID == yyy) {
+      console.log("yep")
+    }
+       //data.sid = socket.sid;
     let ret = {addr_v : data , sid: socket.id}
     // sending to all clients in the room (channel) except sender
     socket.broadcast.to(room).emit('addr_v', ret);
@@ -95,10 +106,17 @@ io.sockets.on('connection', socket => {
     socket.broadcast.to(room).emit('approve', data);
   });
 
-  socket.on('claim', (data) => {
-    console.log("claim",data)
+  socket.on('claim', (sid) => {
+    console.log("claim",sid)
     // sending to all clients in the room (channel) except sender
-    io.in(room).emit('claim',data)
+    io.to(sid).emit('claim')
+    //socket.broadcast.to(room).emit('claim');
+  });
+
+  socket.on('transfer', (data) => {
+    console.log("transer",data)
+    // sending to all clients in the room (channel) except sender
+    socket.broadcast.to(room).emit('transfer', data);
   });
 
   socket.on('accept', id => {
@@ -110,8 +128,8 @@ io.sockets.on('connection', socket => {
   });
 
   socket.on('reject', (sid,message) => {
-    console.log("reject")
-    socket.emit('hangup',message)
+    console.log("reject" , sid)
+    io.to(sid).emit('hangup',message)
     //socket.emit('full')
     viewr_id = ''
   });

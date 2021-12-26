@@ -40,7 +40,9 @@ class MediaBridge extends Component {
       .then(stream => this.localVideo.srcObject = this.localStream = stream);
     this.props.socket.on('message', this.onMessage);
     this.props.socket.on('hangup', this.onRemoteHangup);
+    
     this.props.socket.on('disconnect', this.onRemoteHangup);
+    this.props.socket.on('claim', this.onClaim);
   }
   componentWillUnmount() {
     this.props.media(null);
@@ -49,16 +51,23 @@ class MediaBridge extends Component {
     }
     this.props.socket.emit('leave');
   }
-  onRemoteHangup() {
+  async onRemoteHangup(props) {
     const owner = store.getState().owner;
     console.log("OWNER onRemoteHangup",owner)
     this.setState({bridge: 'host-hangup',  minutes: 0});
     if(!owner){
+      toast.error(`Broadcastre HangUp`)
+      await new Promise(resolve => setTimeout(resolve, 2000));  
       window.history.back()
     }else{
-      toast("Viewer Hangup", { autoClose: 2000, pauseOnHover: false })
+      toast("Session Hangup", { autoClose: 2000, pauseOnHover: false })
     }
   }
+
+  onClaim() {
+    console.log("claim");
+    toast("Broadcaster is claiming tokens", { autoClose: 2000, pauseOnHover: false })
+  };  
 
   onMessage(message) {
       if (message.type === 'offer') {
@@ -99,7 +108,7 @@ class MediaBridge extends Component {
   sendDescription() {
     this.props.socket.send(this.pc.localDescription);
   }
-  hangup() {
+  async hangup() {
     const owner = store.getState().owner;
     console.log("OWNER hangup",owner)
     if(owner) {
@@ -107,7 +116,9 @@ class MediaBridge extends Component {
     } else {
       this.setState({bridge: 'full'})
       this.pc.close()
-      window.history.back()
+      toast.error(`Broadcastre HangUp`)
+      await new Promise(resolve => setTimeout(resolve, 2000));  
+      window.history.back()      
     }  
     this.props.socket.emit('leave');
   }
