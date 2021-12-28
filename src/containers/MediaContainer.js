@@ -51,13 +51,13 @@ class MediaBridge extends Component {
     }
     this.props.socket.emit('leave');
   }
-  async onRemoteHangup(props) {
+  async onRemoteHangup(message) {
     const owner = store.getState().owner;
     console.log("OWNER onRemoteHangup",owner)
     this.setState({bridge: 'host-hangup',  minutes: 0});
     if(!owner){
-      toast.error(`Broadcastre HangUp`)
-      await new Promise(resolve => setTimeout(resolve, 2000));  
+      toast.error(`Session HangUp : ${message}`)
+      await new Promise(resolve => setTimeout(resolve, 3000));  
       window.history.back()
     }else{
       toast("Session Hangup", { autoClose: 2000, pauseOnHover: false })
@@ -117,7 +117,7 @@ class MediaBridge extends Component {
       this.setState({bridge: 'full'})
       this.pc.close()
       toast.error(`Broadcastre HangUp`)
-      await new Promise(resolve => setTimeout(resolve, 2000));  
+      await new Promise(resolve => setTimeout(resolve, 3000));  
       window.history.back()      
     }  
     this.props.socket.emit('leave');
@@ -181,8 +181,8 @@ class MediaBridge extends Component {
   render(){
     return (
       <div className={`media-bridge ${this.state.bridge}`}>
-        <div id="pageloader" class="pageloader is-left-to-right is-theme"></div>
-        <div id="infraloader" class="infraloader is-active"></div>        
+        <div id="pageloader" className="pageloader is-left-to-right is-theme"></div>
+        <div id="infraloader" className="infraloader is-active"></div>        
         <ToastContainer autoClose={2000}/>
         <video className="remote-video" ref={(ref) => this.remoteVideo = ref} autoPlay></video>
         <video className="local-video" ref={(ref) => this.localVideo = ref} autoPlay muted></video>

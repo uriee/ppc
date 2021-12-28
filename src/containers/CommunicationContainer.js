@@ -75,8 +75,27 @@ class CommunicationContainer extends React.Component {
       this.props.media.init()
     });
 
-    socket.on('hangup', props => {
+    socket.on('hangup', async (message) => {
       console.log("Hangup minuts = 0")
+      /*
+      let allowance = await this.ppcToken.allowance(this.state.addr_v, this.state.addr_b)
+      console.log("allowance:",allowance,this.state.addr_v, this.state.addr_b)      
+      if(allowance) {
+        const ret = await this.ppcToken.transferFrom(this.state.addr_v, this.state.addr_b,  '0')
+        this.props.socket.emit('claim',this.state.sid);
+        toast.promise(
+          ret.wait(),
+          {
+            pending: 'Getting the preciouse tokens',
+            success: 'Tokens recieved 👌',
+            error: 'Error 🤯',
+            autoClose: 2000, pauseOnHover: false 
+          }
+        )
+        const redeem =  await ret.wait()
+        console.log("REDEEM:",redeem)        
+      }
+    */      
       this.setState({ minutes: 0 });
     });    
 
@@ -91,7 +110,7 @@ class CommunicationContainer extends React.Component {
       console.log("disconnect:",props);
       this.props.media.setState({bridge: 'full'});
       toast.error(`Diconnected`)
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, 3000));
       window.history.back()
     });    
 
@@ -107,15 +126,8 @@ class CommunicationContainer extends React.Component {
       this.setState({ addr_v: addr_v.addr_v, payment: addr_v.payment });
       toast(`SomeOne is considering a session for ${addr_v.payment} PPC.`, { autoClose: 2000, pauseOnHover: false })
       if (parseInt(state.fee) > parseInt(addr_v.payment)) {
-        console.log("PARSE",parseInt(state.fee) > parseInt(addr_v.payment))
         this.props.socket.emit('reject', sid, "You need to pay more.")
         return;
-      }
-      console.log("PARSE PASS",parseInt(state.fee) > parseInt(addr_v.payment))
-      if(addr_v.chatID != '' && socket.id != addr_v.chatID){
-        console.log("wrong chat id ",addr_v.chatID, socket.id)
-        //this.props.socket.emit('reject', this.state.sid, "Wrong chat id, probably a scam.")
-        //return;
       }
 
       store.dispatch({ type: 'SET_PAYMENT', payment:  addr_v.payment})
@@ -132,7 +144,7 @@ class CommunicationContainer extends React.Component {
       this.approve(addr_b);
       toast("Broadcaster is online and free to chat", { autoClose: 2000, pauseOnHover: false })
     });
-
+0
     socket.on('transfer', (props) => {
       console.log("transfer:",props);
       toast("Viewr is transfering tokens", { autoClose: 2000, pauseOnHover: false })
@@ -153,7 +165,7 @@ class CommunicationContainer extends React.Component {
       this.signerAddress = signerAddress
       if(!ppcToken){
         toast.error(`No wallet Detected`)
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        await new Promise(resolve => setTimeout(resolve, 3000));
         window.history.back()
       }
       this.ppcToken = ppcToken
@@ -258,25 +270,6 @@ class CommunicationContainer extends React.Component {
   async handleHangup() {
     console.log("Hang up")
     this.props.media.hangup();
-    let allowance = await this.ppcToken.allowance(this.state.addr_v, this.state.addr_b)
-    console.log("allowance:",allowance,this.state.addr_v, this.state.addr_b)
-    /*
-    if(allowance) {
-      const ret = await this.ppcToken.transferFrom(this.state.addr_v, this.state.addr_b,  '0')
-      this.props.socket.emit('claim',this.state.sid);
-      toast.promise(
-        ret.wait(),
-        {
-          pending: 'Getting the preciouse tokens',
-          success: 'Tokens recieved 👌',
-          error: 'Error 🤯',
-          autoClose: 2000, pauseOnHover: false 
-        }
-      )
-      const redeem =  await ret.wait()
-      console.log("REDEEM:",redeem)        
-    }
-  */
     this.setState({ minutes: 0 });
   }
   render(){

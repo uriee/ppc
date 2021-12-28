@@ -9,7 +9,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 const Switch = ({ isOn, handleToggle, onColor }) => {
   return (
-    <>
+    <div style={{marginBottom: '50px'}}>
       <input
         checked={isOn}
         onChange={handleToggle}
@@ -25,7 +25,7 @@ const Switch = ({ isOn, handleToggle, onColor }) => {
       >{isOn ? (<span style={{padding: '5px'}}>Broadcaster</span>) : (<span style={{position: 'absolute', right: '0px', padding: '5px'}}>Viewr</span>)}
         <span className={`react-switch-button`} />
       </label>
-    </>
+    </div>
   );
 };
 
@@ -84,11 +84,15 @@ const Home = (props) => {
 
   return (
     <div className="home">
-          <div id="pageloader" class="pageloader is-left-to-right is-theme"></div>
-          <div id="infraloader" class="infraloader is-active"></div>
+          <div id="pageloader" className="pageloader is-left-to-right is-theme"></div>
+          <div id="infraloader" className="infraloader is-active"></div>
         <div>
           <h1 className="title is-1 is-light is-semibold is-spaced main-title">Pay Per Chat</h1>
-          <h1 className="subtitle is-5 is-light is-thin">using the PPC token</h1>
+          <h1 className="subtitle is-5 is-light is-thin">
+          <div>
+              <Switch  isOn={isBroadcaster} onColor="#3f00fc"  handleToggle={handleRoleChange}/>
+            </div>
+          </h1>
           <ToastContainer />
 
 
@@ -100,11 +104,7 @@ const Home = (props) => {
                 <span className="bar"></span>
                 <label>Room Name.</label>
             </div>
-
-            <p  >
-              <Switch  isOn={isBroadcaster} onColor="#3f00fc"  handleToggle={handleRoleChange}/>
-            </p>
-            
+           
             {isBroadcaster ? (
               <div>
               <div className="control-material is-secondary">

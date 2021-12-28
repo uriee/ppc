@@ -65,16 +65,15 @@ const Communication = props =>
     </div>
     {props.minutes > 0 && <div className="timer"><Timer minutes={props.minutes} ></Timer></div>}
     <div className="request-access">
-      <p><span className="you-left">You hung up.&nbsp;</span>Send an invitation to join the room. {props.sid}</p>
+      <p><span className="you-left">You hung up.&nbsp;</span>Send a request to the Broadcaster. {props.sid}</p>
       <form onSubmit={props.send}>
         <input type="text" autoFocus onChange={props.handleInput} data-ref="message"  maxLength="30" required placeholder="Hi, I'm John Doe." />
         <button className="primary-button">Send</button>
       </form>
     </div>
     <div className="grant-access">
-      <p>A Viewr Wants to Chat:</p>
+      <p>User Approved Payment of {props.payment} PPC tokens</p>
       <div>Message: {props.message}</div>
-      <div>User Approved Payment of: {props.payment} : {store.getState().payment}  PPC tokens</div>
       <button onClick={props.handleInvitation} data-ref="reject" className="primary-button">Reject</button>
       <button onClick={props.handleInvitation} data-ref="accept" className="primary-button">Accept</button>
     </div>
@@ -83,7 +82,7 @@ const Communication = props =>
       <Link  className="primary-button" to="/">OK</Link>
     </div>
     <div className="waiting">
-      <p><span>Waiting for someone to join this room:&nbsp;</span><a href={window.location.href}>{window.location.href}</a>  Chat ID: {props.sid}</p>
+      <p><span>Waiting for a Viewer at:&nbsp;</span><a href={window.location.href}>{window.location.href}</a>  Chat ID:&nbsp; {props.sid}</p>
     </div>
   </div>
 
