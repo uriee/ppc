@@ -87,7 +87,7 @@ const Home = (props) => {
           <div id="pageloader" className="pageloader is-left-to-right is-theme"></div>
           <div id="infraloader" className="infraloader is-active"></div>
         <div>
-          <h1 className="title is-1 is-light is-semibold is-spaced main-title">Pay Per Chat</h1>
+          <h1 className="title is-1 is-light is-semibold is-spaced main-title">CrypToMeet.me</h1>
           <h1 className="subtitle is-5 is-light is-thin">
           <div>
               <Switch  isOn={isBroadcaster} onColor="#3f00fc"  handleToggle={handleRoleChange}/>
