@@ -7,6 +7,23 @@ const sio = require('socket.io');
 const favicon = require('serve-favicon');
 const compression = require('compression');
 
+const redis = require('redis');
+const { promisify } = require('util');
+/*
+const client = redis.createClient({
+    host: 'localhost',
+    port: ,
+    password: '<password>'
+});
+*/
+const redis_client = redis.createClient();
+
+redis_client.on('error', err => {
+    console.log('Error ' + err);
+});
+const setAsync = promisify(redis_client.set).bind(redis_client);
+const getAsync = promisify(redis_client.get).bind(redis_client);
+
 const app = express(),
   options = { 
     key: fs.readFileSync(__dirname + '/rtc-video-room-key.pem'),
@@ -33,11 +50,24 @@ io.sockets.on('connection', socket => {
   let payment = 0;
   let interval = 0;
 
-  socket.on('disconnect', function () {
+  socket.on('disconnect', async function () {
+
     try {
       socket.broadcast.to(room).emit('disconnect');
-    }catch(e){
-      console.log("HEYYYYY WAIT WHER ARE YOU GOING?")
+      // redis - if exists socket->room delete room & socket & waiting list else remove from  waiting list
+      const exists = await getAsync(room)
+      if(exists) {
+        redis_client.del(room)
+        redis_client.del(`${room}:waitinglist`)
+        redis_client.del(socket.id)
+      } else{
+        const wl = JSON.parse(getAsync(`${room}:waitinglist`))
+        const filtered = JSON.stringify(wl.filter(x=> x.socket != socket.id))
+        const ret = await setAsync(`${room}:waitinglist`, filtered)
+      }
+
+      }catch(e){
+      console.log("HEYYYYY WAIT WHERE ARE YOU GOING?")
     }
   });
 
@@ -46,7 +76,8 @@ io.sockets.on('connection', socket => {
     console.log("messgae",message)
     socket.broadcast.to(room).emit('message', message)
   });
-  socket.on('find', (stateObj) => {
+
+  socket.on('find', async (stateObj) => {
     console.log("find",stateObj,fee,interval,payment)
     const url = socket.request.headers.referer.split('/');
     room = url[url.length - 1];
@@ -54,6 +85,12 @@ io.sockets.on('connection', socket => {
     if (sr === undefined) {
       // no room with such name is found so create it
       socket.join(room);
+
+      // redis = add room=>socket, socket->room, room::waiting_list->[]
+      const c1 = await setAsync(room, socket.id )
+      const c2 = await setAsync(socket.id, room)
+      const c3 = await setAsync(`${room}:waitinglist`, '[]')
+      console.log("CC:",c1,c2,c3)
       socket.emit('create',{id: socket.id});
       broadcaster_id = socket.id;
       fee = stateObj.fee;
@@ -67,9 +104,8 @@ io.sockets.on('connection', socket => {
     }
   });
 
-  socket.on('addr_v', data => {
-    console.log("addr_v",data,)
-   
+  socket.on('addr_v', async data => {
+    console.log("addr_v",data)
     let Rooms = io.sockets.adapter.rooms
     let Room = Rooms ? Rooms[data.roomID] : 0
     const broadcaster_socket = Room.sockets && Object.keys(Room.sockets)
@@ -82,6 +118,16 @@ io.sockets.on('connection', socket => {
     let ret = {addr_v : data , sid: socket.id}
     // sending to all clients in the room (channel) except sender
     socket.broadcast.to(room).emit('addr_v', ret);
+    //redis - room::waiting_list->{socket,pay,message} 
+    const wl = JSON.parse(getAsync(`${room}:waitinglist`))
+    wl.push({
+      socket: socket.id,
+      pay: data,
+      message: data
+    })
+    //wl sort
+
+    const c3 = await setAsync(`${room}:waitinglist`, JSON.stringify(wl))
   });
 
   socket.on('addr_b', data => {
@@ -108,7 +154,6 @@ io.sockets.on('connection', socket => {
     console.log("claim",sid)
     // sending to all clients in the room (channel) except sender
     io.to(sid).emit('claim')
-    //socket.broadcast.to(room).emit('claim');
   });
 
   socket.on('transfer', (data) => {
