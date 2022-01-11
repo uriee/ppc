@@ -7,6 +7,15 @@ const sio = require('socket.io');
 const favicon = require('serve-favicon');
 const compression = require('compression');
 
+const redis = require('redis');
+const redis_client = redis.createClient();
+
+redis_client.on('error', err => {
+    console.log('Error ' + err);
+});
+
+const dbg = (message) => console.log("DBG:",message)
+
 const app = express(),
   options = { 
     key: fs.readFileSync(__dirname + '/rtc-video-room-key.pem'),
@@ -54,6 +63,9 @@ io.sockets.on('connection', socket => {
     if (sr === undefined) {
       // no room with such name is found so create it
       socket.join(room);
+      const c1 = redis_client.set(room, socket.id ,dbg)
+      const c2 = redis_client.set(socket.id, room, dbg)
+      const c3 = redis_client.set(`${room}:waitinglist`, '[]', dbg)  
       socket.emit('create',{id: socket.id});
       broadcaster_id = socket.id;
       fee = stateObj.fee;
