@@ -41,6 +41,7 @@ class MediaBridge extends Component {
     this.props.socket.on('message', this.onMessage);
     this.props.socket.on('hangup', this.onRemoteHangup);
     
+    this.props.socket.on('disco', this.onRemoteHangup);
     this.props.socket.on('disconnect', this.onRemoteHangup);
     this.props.socket.on('claim', this.onClaim);
   }

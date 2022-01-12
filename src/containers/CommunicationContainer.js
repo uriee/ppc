@@ -106,13 +106,21 @@ class CommunicationContainer extends React.Component {
       this.setState({id :props.sid})
     });
 
-    socket.on('disconnect', async (props) => {
+    socket.on('disco', async (props) => {
       console.log("disconnect:",props);
       this.props.media.setState({bridge: 'full'});
       toast.error(`Diconnected`)
       await new Promise(resolve => setTimeout(resolve, 3000));
       window.history.back()
     });    
+
+    socket.on('disconnect', async (props) => {
+      console.log("disconnect:",props);
+      this.props.media.setState({bridge: 'full'});
+      toast.error(`Diconnected`)
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      window.history.back()
+    });     
 
     socket.on('approve', ({ message, sid }) => {
       console.log("approve",message,sid)
