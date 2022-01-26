@@ -3,20 +3,29 @@ const path = require('path');
 const fs = require('fs');
 const http = require('http');
 const https = require('https');
-const sio = require('socket.io');
+const { Server }= require('socket.io');
 const favicon = require('serve-favicon');
 const compression = require('compression');
+
+const { createAdapter } = require("@socket.io/redis-adapter")
+const { createClient } = require("redis")
 
 const app = express(),
   options = { 
     key: fs.readFileSync(__dirname + '/rtc-video-room-key.pem'),
     cert: fs.readFileSync(__dirname + '/rtc-video-room-cert.pem')
   },
-  port = process.env.PORT || 3000,
-  server = process.env.NODE_ENV === 'production' ?
-    http.createServer(app).listen(port) :
-    https.createServer(options, app).listen(port),
-  io = sio(server);
+port = process.env.PORT || 3000,
+server = process.env.NODE_ENV === 'production' ?
+  http.createServer(app).listen(port) :
+  https.createServer(options, app).listen(port)
+  
+const io = new Server(server, { /* options */ });
+//const pubClient = createClient({ url: "redis://localhost:6379" });
+//const subClient = pubClient.duplicate();
+//io.adapter(createAdapter(pubClient, subClient));
+
+
 // compress all requests
 app.use(compression());
 app.use(express.static(path.join(__dirname, 'dist')));
@@ -24,7 +33,7 @@ app.use((req, res) => res.sendFile(__dirname + '/dist/index.html'));
 app.use(favicon('./dist/favicon.ico'));
 // Switch off the default 'X-Powered-By: Express' header
 app.disable('x-powered-by');
-io.sockets.on('connection', socket => {
+io.on('connection', socket => {
   console.log("connection")
   let room = '';
   let broadcaster_id = '';
@@ -46,11 +55,13 @@ io.sockets.on('connection', socket => {
     console.log("messgae",message)
     socket.broadcast.to(room).emit('message', message)
   });
-  socket.on('find', (stateObj) => {
-    console.log("find",stateObj,fee,interval,payment)
+  socket.on('find', async (stateObj) => {
     const url = socket.request.headers.referer.split('/');
     room = url[url.length - 1];
-    const sr = io.sockets.adapter.rooms[room];
+    const rooms = io.of("/").adapter.rooms;
+    const sr = rooms.get(room,viewr_id)
+    console.log("find",room,sr,sr && sr.size)
+
     if (sr === undefined) {
       // no room with such name is found so create it
       socket.join(room);
@@ -58,8 +69,9 @@ io.sockets.on('connection', socket => {
       broadcaster_id = socket.id;
       fee = stateObj.fee;
       interval = stateObj.interval;
-    } else if (sr.length === 1 && viewr_id == '') {
+    } else if (sr.size === 1 && viewr_id == '') {
       socket.emit('join',{fee,interval,sid: broadcaster_id});
+      console.log("pppp",fee,interval,broadcaster_id)
       viewr_id = socket.id;
       payment = stateObj.payment
     } else { // max two clients
@@ -67,13 +79,14 @@ io.sockets.on('connection', socket => {
     }
   });
 
-  socket.on('addr_v', data => {
+  socket.on('addr_v', async data => {
     console.log("addr_v",data,)
    
     let Rooms = io.sockets.adapter.rooms
     let Room = Rooms ? Rooms[data.roomID] : 0
-    const broadcaster_socket = Room.sockets && Object.keys(Room.sockets)
-    //console.log("broadcaster socket:",data.chatID , broadcaster_socket)
+    const broadcaster_socket = 0//Room.sockets && Object.keys(Room.sockets)
+
+    console.log("broadcaster socket:",data.chatID , broadcaster_socket)
     if ( data.chatID > '' && !(data.chatID == broadcaster_socket)) {
       console.log("yop")
       socket.emit('hangup',"Wrong Chat ID")
@@ -81,7 +94,7 @@ io.sockets.on('connection', socket => {
        //data.sid = socket.sid;
     let ret = {addr_v : data , sid: socket.id}
     // sending to all clients in the room (channel) except sender
-    socket.broadcast.to(room).emit('addr_v', ret);
+    socket.to(room).emit('addr_v', ret);
   });
 
   socket.on('addr_b', data => {
@@ -96,7 +109,6 @@ io.sockets.on('connection', socket => {
     ///socket.broadcast.to(room).emit('addr_b', data);
   });
     
-  
   socket.on('auth', data => {
     console.log("auth",data)
     data.sid = socket.id;
@@ -135,7 +147,7 @@ io.sockets.on('connection', socket => {
   socket.on('leave', () => {
     console.log("leave")
     // sending to all clients in the room (channel) except sender
-    socket.broadcast.to(room).emit('hangup',"Broadcaster left has terminatyer the broadcast");
+    //io.in(room).emit('hangup',"Broadcaster left has terminatyer the broadcast");
     if (socket.id == broadcaster_id) {
       (viewr_id > '') && io.sockets.connected[viewr_id].leave(room);
       console.log("VIEWR_ID_1",viewr_id);
