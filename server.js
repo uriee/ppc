@@ -60,15 +60,17 @@ io.on('connection', socket => {
     console.log("messgae",message)
     socket.broadcast.to(room).emit('message', message)
   });
+
   socket.on('find', async (stateObj) => {
     const url = socket.request.headers.referer.split('/');
     room = url[url.length - 1];
-    const rooms = io.of("/").adapter.rooms;
-   console.log("ROOMS",rooms)
-    const sr = rooms.get(room,viewr_id)
-    console.log("find",room,sr,sr && sr.size)
+    //const rooms = io.of("/").adapter.rooms;
+    const sr = await io.in(room).allSockets();
+    const rooms = await io.of('/').adapter.allRooms();
+    //const sr = rooms.get(room,viewr_id)
+    console.log("find",room,sr,sr && sr.size,rooms)
 
-    if (sr === undefined) {
+    if (sr && sr.size == 0) {
       // no room with such name is found so create it
       socket.join(room);
       socket.emit('create',{id: socket.id});
@@ -89,9 +91,8 @@ io.on('connection', socket => {
     console.log("addr_v",data,)
    
 
-    const Rooms = io.of("/").adapter.rooms;
-    const Room = Array.from(Rooms.get(data.roomID)) || 0
-    const broadcaster_socket = Room[0] || 0
+    const rs =  await io.in(room).allSockets();
+    const broadcaster_socket = (Array.from(rs)).filter(x => x != socket.id)[0] || 0
 
     console.log("broadcaster socket:",data.chatID , broadcaster_socket)
     if ( data.chatID > '' && !(data.chatID == broadcaster_socket)) {
@@ -152,22 +153,20 @@ io.on('connection', socket => {
     viewr_id = ''
   });
   
-  socket.on('leave', () => {
+  socket.on('leave', async () => {
     console.log("leave")
     // sending to all clients in the room (channel) except sender
     //io.in(room).emit('hangup',"Broadcaster left has terminatyer the broadcast");
     if (socket.id == broadcaster_id) {
-      const Rooms = io.of("/").adapter.rooms;
-      const Room = Array.from(Rooms.get(room)) || 0
-      const viewr_socket = Room.filter(x=> x != socket.id)[0] || 0
-      console.log("ZZZ",viewr_socket,Room);
+      const rs =  await io.in(room).allSockets();
+      const viewr_socket = (Array.from(rs)).filter(x => x != socket.id)[0] || 0
+      console.log("ZZZ",viewr_socket);
       if(viewr_socket > '') {
         io.to(viewr_socket).emit('hangup',"Earner hangup")
         io.in(viewr_socket).socketsLeave(room);
       } 
       const Rooms2 = io.of("/").adapter.rooms;
-      const Room2 = Array.from(Rooms2.get(room)) 
-      console.log("ZZZ2",Room);      
+      const Room2 = Array.from(Rooms2.get(room))       
       console.log("VIEWR_ID_1",viewr_socket,room);
       viewr_id = ''
     }else {
