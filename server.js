@@ -44,7 +44,7 @@ io.on('connection', socket => {
 
   socket.on('disconnect', function () {
     try {
-      socket.broadcast.to(room).emit('disconnect');
+      socket.to(room).emit('disconnect');
     }catch(e){
       console.log("HEYYYYY WAIT WHER ARE YOU GOING?")
     }
@@ -154,14 +154,19 @@ io.on('connection', socket => {
       const Rooms = io.of("/").adapter.rooms;
       const Room = Array.from(Rooms.get(room)) || 0
       const viewr_socket = Room.filter(x=> x != socket.id)[0] || 0
-      console.log("ZZZ",viewr_socket,room);
-      viewr_socket > '' && io.in(viewr_socket).socketsLeave(room);
+      console.log("ZZZ",viewr_socket,Room);
+      if(viewr_socket > '') {
+        io.to(viewr_socket).emit('hangup',"Earner hangup")
+        io.in(viewr_socket).socketsLeave(room);
+      } 
+      const Rooms2 = io.of("/").adapter.rooms;
+      const Room2 = Array.from(Rooms2.get(room)) 
+      console.log("ZZZ2",Room);      
       console.log("VIEWR_ID_1",viewr_socket,room);
       viewr_id = ''
     }else {
-      socket.leave(room);
-    }
-    
+      socket.to(room).emit('hangup',"Provider Has left the Space");
+    } 
   });
 });
 
