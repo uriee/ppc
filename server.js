@@ -15,15 +15,20 @@ const app = express(),
     key: fs.readFileSync(__dirname + '/rtc-video-room-key.pem'),
     cert: fs.readFileSync(__dirname + '/rtc-video-room-cert.pem')
   },
-port = process.env.PORT || 3000,
+port = 3001,
 server = process.env.NODE_ENV === 'production' ?
   http.createServer(app).listen(port) :
   https.createServer(options, app).listen(port)
   
 const io = new Server(server, { /* options */ });
-//const pubClient = createClient({ url: "redis://localhost:6379" });
-//const subClient = pubClient.duplicate();
+const pubClient = createClient({ url: "redis://localhost:6379" });
+const subClient = pubClient.duplicate();
 //io.adapter(createAdapter(pubClient, subClient));
+
+Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
+  io.adapter(createAdapter(pubClient, subClient));
+  //io.listen(3000);
+});
 
 
 // compress all requests
@@ -44,7 +49,7 @@ io.on('connection', socket => {
 
   socket.on('disconnect', function () {
     try {
-      socket.to(room).emit('disconnect');
+      socket.to(room).emit('hangup');
     }catch(e){
       console.log("HEYYYYY WAIT WHER ARE YOU GOING?")
     }
@@ -59,6 +64,7 @@ io.on('connection', socket => {
     const url = socket.request.headers.referer.split('/');
     room = url[url.length - 1];
     const rooms = io.of("/").adapter.rooms;
+   console.log("ROOMS",rooms)
     const sr = rooms.get(room,viewr_id)
     console.log("find",room,sr,sr && sr.size)
 
