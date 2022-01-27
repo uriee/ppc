@@ -82,23 +82,24 @@ io.on('connection', socket => {
   socket.on('addr_v', async data => {
     console.log("addr_v",data,)
    
-    let Rooms = io.sockets.adapter.rooms
-    let Room = Rooms ? Rooms[data.roomID] : 0
-    const broadcaster_socket = 0//Room.sockets && Object.keys(Room.sockets)
+
+    const Rooms = io.of("/").adapter.rooms;
+    const Room = Array.from(Rooms.get(data.roomID)) || 0
+    const broadcaster_socket = Room[0] || 0
 
     console.log("broadcaster socket:",data.chatID , broadcaster_socket)
     if ( data.chatID > '' && !(data.chatID == broadcaster_socket)) {
       console.log("yop")
       socket.emit('hangup',"Wrong Chat ID")
+    }else{
+        //data.sid = socket.sid;
+      let ret = {addr_v : data , sid: socket.id}
+      // sending to all clients in the room (channel) except sender
+      socket.to(room).emit('addr_v', ret);
     }
-       //data.sid = socket.sid;
-    let ret = {addr_v : data , sid: socket.id}
-    // sending to all clients in the room (channel) except sender
-    socket.to(room).emit('addr_v', ret);
   });
 
   socket.on('addr_b', data => {
-    
     let {addr_b , sid } = data;
     fee = data.fee;
     interval = data.interval;
@@ -129,16 +130,17 @@ io.on('connection', socket => {
     socket.broadcast.to(room).emit('transfer', data);
   });
 
-  socket.on('accept', id => {
-    console.log("accept",id)
-    io.sockets.connected[id].join(room);
+  socket.on('accept', sid => {
+    console.log("accept",sid)
+    //io.sockets.connected[id].join(room);
+    io.in(sid).socketsJoin(room)
     const ret = {fee , interval};
     // sending to all clients in 'game' room(channel), include sender
     io.in(room).emit('bridge',ret);
   });
 
   socket.on('reject', (sid,message) => {
-    console.log("reject" , sid)
+    console.log("reject" , sid, message)
     io.to(sid).emit('hangup',message)
     //socket.emit('full')
     viewr_id = ''
@@ -149,8 +151,12 @@ io.on('connection', socket => {
     // sending to all clients in the room (channel) except sender
     //io.in(room).emit('hangup',"Broadcaster left has terminatyer the broadcast");
     if (socket.id == broadcaster_id) {
-      (viewr_id > '') && io.sockets.connected[viewr_id].leave(room);
-      console.log("VIEWR_ID_1",viewr_id);
+      const Rooms = io.of("/").adapter.rooms;
+      const Room = Array.from(Rooms.get(room)) || 0
+      const viewr_socket = Room.filter(x=> x != socket.id)[0] || 0
+      console.log("ZZZ",viewr_socket,room);
+      viewr_socket > '' && io.in(viewr_socket).socketsLeave(room);
+      console.log("VIEWR_ID_1",viewr_socket,room);
       viewr_id = ''
     }else {
       socket.leave(room);
