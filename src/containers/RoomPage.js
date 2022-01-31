@@ -12,7 +12,12 @@ class RoomPage extends Component {
       audio: true,
       video: true
     }).catch(e => alert('getUserMedia() error: ' + e.name))
-    this.socket = io.connect();
+
+    //this.socket = io.connect('https//localhost:3002');
+    this.socket = io( {
+    // WARNING: in that case, there is no fallback to long-polling
+    transports: [ "websocket" ] // or [ "websocket", "polling" ] (the order matters)
+    });
   }
   componentDidMount() {
     this.props.addRoom();

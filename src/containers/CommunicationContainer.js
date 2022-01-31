@@ -57,7 +57,8 @@ class CommunicationContainer extends React.Component {
     const stateObj = {
       fee: state.fee,
       interval: state.interval,
-      payment: state.payment
+      payment: state.payment,
+      roomID: store.getState().roomID
     }
 
     socket.on('create', (props) => {

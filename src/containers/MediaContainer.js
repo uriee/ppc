@@ -24,7 +24,6 @@ class MediaBridge extends Component {
     this.sendDescription = this.sendDescription.bind(this);
     this.hangup = this.hangup.bind(this);
     this.init = this.init.bind(this);
-    this.setDescription = this.setDescription.bind(this);
   }
   componentDidMount() {
     const pageloader = document.getElementById('pageloader');
@@ -70,6 +69,7 @@ class MediaBridge extends Component {
   };  
 
   onMessage(message) {
+    console.log("onMessage",message)
       if (message.type === 'offer') {
             // set remote description and answer
             this.pc.setRemoteDescription(new RTCSessionDescription(message))
@@ -123,7 +123,7 @@ class MediaBridge extends Component {
     this.props.socket.emit('leave');
   }
   handleError(e) {
-    console.log(e);
+    console.log("HandleError",e);
   }
   init() {
     // wait for local media to be ready
@@ -161,6 +161,7 @@ class MediaBridge extends Component {
     };
     this.pc.ondatachannel = e => {
         // data channel
+        console.log('onDatachannel', e) 
         this.dc = e.channel;
         this.setupDataHandlers();
         this.sendData({
