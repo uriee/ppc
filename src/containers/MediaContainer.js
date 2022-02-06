@@ -55,7 +55,7 @@ class MediaBridge extends Component {
     console.log("OWNER onRemoteHangup",owner)
     this.setState({bridge: 'host-hangup',  minutes: 0});
     if(!owner){
-      toast.error(`Session HangUp : ${message}`)
+      toast.error(message)
       await new Promise(resolve => setTimeout(resolve, 3000));  
       window.history.back()
     }else{

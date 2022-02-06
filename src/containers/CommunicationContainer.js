@@ -77,26 +77,7 @@ class CommunicationContainer extends React.Component {
     });
 
     socket.on('hangup', async (message) => {
-      console.log("Hangup minuts = 0")
-      /*
-      let allowance = await this.ppcToken.allowance(this.state.addr_v, this.state.addr_b)
-      console.log("allowance:",allowance,this.state.addr_v, this.state.addr_b)      
-      if(allowance) {
-        const ret = await this.ppcToken.transferFrom(this.state.addr_v, this.state.addr_b,  '0')
-        this.props.socket.emit('claim',this.state.sid);
-        toast.promise(
-          ret.wait(),
-          {
-            pending: 'Getting the preciouse tokens',
-            success: 'Tokens recieved 👌',
-            error: 'Error 🤯',
-            autoClose: 2000, pauseOnHover: false 
-          }
-        )
-        const redeem =  await ret.wait()
-        console.log("REDEEM:",redeem)        
-      }
-    */      
+      console.log("Hangup minuts = 0")   
       this.setState({ minutes: 0 });
     });    
 
@@ -113,6 +94,7 @@ class CommunicationContainer extends React.Component {
       toast.error(`Diconnected`)
       await new Promise(resolve => setTimeout(resolve, 3000));
       window.history.back()
+      
     });    
 
     socket.on('approve', ({ message, sid }) => {
@@ -145,10 +127,11 @@ class CommunicationContainer extends React.Component {
       this.approve(addr_b);
       toast("Broadcaster is online and free to chat", { autoClose: 2000, pauseOnHover: false })
     });
-0
+    
     socket.on('transfer', (props) => {
       console.log("transfer:",props);
       toast("Viewr is transfering tokens", { autoClose: 2000, pauseOnHover: false })
+      socket.emit('lock',props)
     });      
 
     socket.emit('find', stateObj);
@@ -166,15 +149,14 @@ class CommunicationContainer extends React.Component {
       this.signerAddress = signerAddress
       if(!ppcToken){
         toast.error(`No wallet Detected`)
-        await new Promise(resolve => setTimeout(resolve, 3000));
-        window.history.back()
+        await new Promise(resolve => setTimeout(resolve, 4000));
+        window.location.assign("https:/cryptomeet.me")
       }
       this.ppcToken = ppcToken
     };
-    console.log("eee",this.ppcToken)
     !this.ppcToken && init();        
-
   }
+
   handleInput(e) {
     this.setState({[e.target.dataset.ref]: e.target.value});
   }

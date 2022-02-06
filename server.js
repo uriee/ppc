@@ -15,7 +15,7 @@ const app = express(),
     key: fs.readFileSync(__dirname + '/rtc-video-room-key.pem'),
     cert: fs.readFileSync(__dirname + '/rtc-video-room-cert.pem')
   },
-port = 3001,
+port = 3002,
 server = process.env.NODE_ENV === 'production' ?
   http.createServer(app).listen(port) :
   https.createServer(options, app).listen(port)
@@ -68,16 +68,12 @@ io.on('connection', socket => {
   });
 
   socket.on('find', async (stateObj) => {
-    //console.log("1:",socket.request)
-    //console.log("2:",socket.request.headers.referer)
-    //const url = socket.request.headers.referer.split('/');
-    room = stateObj.roomID//url[url.length - 1];
-    //const rooms = io.of("/").adapter.rooms;
+
+    room = stateObj.roomID
     const sr = await io.in(room).allSockets();
     sr.delete(null)
-    const rooms = await io.of('/').adapter.allRooms();
-    //const sr = rooms.get(room,viewr_id)
-    console.log("find",room,sr,sr && sr.size,rooms)
+
+    console.log("find",room,sr,sr && sr.size)
 
     if (sr && sr.size == 0) {
       // no room with such name is found so create it
@@ -88,24 +84,21 @@ io.on('connection', socket => {
       interval = stateObj.interval;
     } else if (sr.size === 1 && viewr_id == '') {
       socket.emit('join',{fee,interval,sid: broadcaster_id});
-      console.log("pppp",fee,interval,broadcaster_id)
       viewr_id = socket.id;
       payment = stateObj.payment
     } else { // max two clients
       socket.emit('full', room);
+      socket.emit('hangup',"Chat Space is accupied");
     }
   });
 
+  //viewer event
   socket.on('addr_v', async data => {
-    console.log("addr_v",data,)
-   
-
+    console.log("addr_v",data,) 
     const rs =  await io.in(room).allSockets();
     const broadcaster_socket = (Array.from(rs)).filter(x => x != socket.id)[0] || 0
-
     console.log("broadcaster socket:",data.chatID , broadcaster_socket)
     if ( data.chatID > '' && !(data.chatID == broadcaster_socket)) {
-      console.log("yop")
       socket.emit('hangup',"Wrong Chat ID")
     }else{
         //data.sid = socket.sid;
@@ -115,6 +108,7 @@ io.on('connection', socket => {
     }
   });
 
+  //broadcaster event
   socket.on('addr_b', data => {
     let {addr_b , sid } = data;
     fee = data.fee;
@@ -122,7 +116,13 @@ io.on('connection', socket => {
     console.log("addr_b",addr_b,sid,fee,data)
     data.bsid = socket.id;
     // sending to all clients in the room (channel) except sender
-    io.to(sid).emit('addr_b',data)
+    if (viewr_id == '') {
+      io.to(sid).emit('addr_b',data)
+      viewr_id = sid
+    }else{
+      io.to(sid).emit('hangup',"The Earner is currently busy :(")
+    }
+
     ///socket.broadcast.to(room).emit('addr_b', data);
   });
     
@@ -141,22 +141,37 @@ io.on('connection', socket => {
   });
 
   socket.on('transfer', (data) => {
-    console.log("transer",data)
+    data.sid = socket.id
+    console.log("transer1",data)
     // sending to all clients in the room (channel) except sender
     socket.broadcast.to(room).emit('transfer', data);
   });
 
+  socket.on('lock', async (data) => {
+    const sid = data.sid
+    console.log("lock",data)
+    if(sid) {
+      await io.of('/').adapter.remoteJoin(data.sid,room);
+      console.log("lock sockets:", await io.in(room).allSockets())
+    }else {
+      socket.broadcast.to(room).emit('hangup', "cannot lock room");
+    }
+
+    // sending to all clients in the room (channel) except sender
+    //socket.broadcast.to(room).emit('transfer', data);
+  });
+
   socket.on('accept', async (sid) => {
     console.log("accept",sid)
-    await io.of('/').adapter.remoteJoin(sid,room);
-    console.log(await io.in(room).allSockets())
-    const ret = {fee , interval};
+    const ret = {fee , interval}; 
     // sending to all clients in 'game' room(channel), include sender
     io.in(room).emit('bridge',ret);
   });
 
-  socket.on('reject', (sid,message) => {
+  socket.on('reject', async (sid,message) => {
     console.log("reject" , sid, message)
+    await io.of('/').adapter.remoteLeave(sid,room);
+    console.log(await io.in(room).allSockets())
     io.to(sid).emit('hangup',message)
     //socket.emit('full')
     viewr_id = ''
