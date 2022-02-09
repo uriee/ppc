@@ -23,7 +23,8 @@ class CommunicationContainer extends React.Component {
       addr_v: null,
       addr_b: null,
       payment : 0,
-      minutes: 0
+      minutes: 0,
+      update : 0
     };
 
     this.handleInvitation = this.handleInvitation.bind(this);
@@ -31,6 +32,7 @@ class CommunicationContainer extends React.Component {
     this.handleInput = this.handleInput.bind(this);
     this.toggleVideo = this.toggleVideo.bind(this);
     this.toggleAudio = this.toggleAudio.bind(this);
+    this.shareScreen = this.shareScreen.bind(this);
     this.send = this.send.bind(this);
 
     this.signerAddress = null
@@ -197,6 +199,9 @@ class CommunicationContainer extends React.Component {
       this.props.socket.emit('auth', this.state);
       this.hideAuth();
     }
+    else{
+      this.setState({update: this.state.update +1})
+    }
   }
 
   Accept = async () => {
@@ -245,11 +250,31 @@ class CommunicationContainer extends React.Component {
     this.props.setVideo(video);
   }
   toggleAudio() {
-    console.log("TOGGLE A")
+    console.log("TOGGLE A",this)
     const audio = this.localStream.getAudioTracks()[0].enabled = !this.state.audio;
     this.setState({audio: audio});
     this.props.setAudio(audio);
   }
+
+  shareScreen() {
+    const stm = this.localStream
+    const videoTrack = stm.getVideoTracks()[0]
+    console.log("stm",stm)
+    navigator.mediaDevices.getDisplayMedia({ cursor: true}).then( stream => {
+      const screenTrack = stream.getTracks()[0]
+      console.log("shsc 1:",stm,screenTrack,videoTrack)
+      stm.removeTrack(videoTrack)
+      stm.addTrack(screenTrack)
+      console.log("shsc 2:",stm)
+      screenTrack.onended = function() {
+        console.log("shsc 3:",stm)
+        stm.removeTrack(screenTrack)
+        stm.addTrack(videoTrack)
+        console.log("shsc 4:",stm)
+      }
+    })
+  }
+
   async handleHangup() {
     console.log("Hang up")
     this.props.media.hangup();
@@ -261,6 +286,7 @@ class CommunicationContainer extends React.Component {
         {...this.state}
         toggleVideo={this.toggleVideo}
         toggleAudio={this.toggleAudio}
+        shareScreen={this.shareScreen}
         send={this.send}
         sid={this.state ? this.state.id : ''}
         minutes={this.state.minutes}

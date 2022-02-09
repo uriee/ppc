@@ -23,6 +23,7 @@ class MediaBridge extends Component {
     this.setDescription = this.setDescription.bind(this);
     this.sendDescription = this.sendDescription.bind(this);
     this.hangup = this.hangup.bind(this);
+    this.shareScreen = this.shareScreen.bind(this);
     this.init = this.init.bind(this);
   }
   componentDidMount() {
@@ -69,7 +70,7 @@ class MediaBridge extends Component {
   };  
 
   onMessage(message) {
-    console.log("onMessage",message)
+    console.log("onMessage",message.type)
       if (message.type === 'offer') {
             // set remote description and answer
             this.pc.setRemoteDescription(new RTCSessionDescription(message))
@@ -86,6 +87,7 @@ class MediaBridge extends Component {
             this.pc.addIceCandidate(message.candidate);
       }
   }
+
   sendData(msg) {
     this.dc.send(JSON.stringify(msg))
   }
@@ -100,14 +102,17 @@ class MediaBridge extends Component {
         console.log('The Data Channel is Closed');
       };
   }
+
   setDescription(offer) {
     console.log("setDesc",offer)
     return this.pc.setLocalDescription(offer);
   }
+
   // send the offer to a server to be forwarded to the other peer
   sendDescription() {
     this.props.socket.send(this.pc.localDescription);
   }
+
   async hangup() {
     const owner = store.getState().owner;
     console.log("OWNER hangup",owner)
@@ -122,6 +127,38 @@ class MediaBridge extends Component {
     }  
     this.props.socket.emit('leave');
   }
+
+  shareScreen() {
+    const stm = this.localStream
+    const videoTrack = stm.getVideoTracks()[0]
+    const localStream = this.localStream
+    const sendData = this.sendData
+    console.log("stm",stm)
+    navigator.mediaDevices.getDisplayMedia({ cursor: true}).then( stream => {
+      const screenTrack = stream.getTracks()[0]
+      console.log("shsc 1:",stm,screenTrack,videoTrack)
+      stm.removeTrack(videoTrack)
+      stm.addTrack(screenTrack)
+      console.log("shsc 2:",stm)
+      screenTrack.onended = function() {
+        console.log("shsc 3:",stm)
+        stm.removeTrack(screenTrack)
+        stm.addTrack(videoTrack)
+        console.log("shsc 4:",stm)
+        sendData({
+          peerMediaStream: {
+            video: localStream.getVideoTracks()[0].enabled
+          }
+        });        
+      }
+      sendData({
+        peerMediaStream: {
+          video: localStream.getVideoTracks()[0].enabled
+        }
+      });      
+    })
+  }
+
   handleError(e) {
     console.log("HandleError",e);
   }
@@ -159,6 +196,13 @@ class MediaBridge extends Component {
         this.remoteVideo.srcObject = this.remoteStream = e.stream;
         this.setState({bridge: 'established'});
     };
+    this.pc.onaddtrack = e => {
+      console.log('onaddtrack', e) 
+      this.remoteStream = e.stream;
+      this.remoteVideo.srcObject = this.remoteStream = e.stream;
+      this.setState({bridge: 'established'});
+  };
+  
     this.pc.ondatachannel = e => {
         // data channel
         console.log('onDatachannel', e) 
@@ -187,6 +231,7 @@ class MediaBridge extends Component {
         <ToastContainer autoClose={2000}/>
         <video className="remote-video" ref={(ref) => this.remoteVideo = ref} autoPlay></video>
         <video className="local-video" ref={(ref) => this.localVideo = ref} autoPlay muted></video>
+        <button className="share-screen" onClick={this.shareScreen} ></button>
       </div>
     );
   }

@@ -51,7 +51,7 @@ const Communication = props =>
           <path className="off" d="M40 8H8c-2.21 0-4 1.79-4 4v24c0 2.21 1.79 4 4 4h32c2.21 0 4-1.79 4-4V12c0-2.21-1.79-4-4-4zm-4 24l-8-6.4V32H12V16h16v6.4l8-6.4v16z" fill="white"></path>
         </svg>
       </button>
-      <button onClick={ToggleFullScreen} className="fullscreen-button">
+      <button onClick={props.shareScreen} className="fullscreen-button">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" className="svg">
           <path className="on" d="M10 32h6v6h4V28H10v4zm6-16h-6v4h10V10h-4v6zm12 22h4v-6h6v-4H28v10zm4-22v-6h-4v10h10v-4h-6z" fill="white"></path>
           <path className="off" d="M14 28h-4v10h10v-4h-6v-6zm-4-8h4v-6h6v-4H10v10zm24 14h-6v4h10V28h-4v6zm-6-24v4h6v6h4V10H28z" fill="white"></path>
@@ -93,6 +93,7 @@ Communication.propTypes = {
   video: PropTypes.bool.isRequired,
   toggleVideo: PropTypes.func.isRequired,
   toggleAudio: PropTypes.func.isRequired,
+  shareScreen: PropTypes.func.isRequired,
   send: PropTypes.func.isRequired,
   handleHangup: PropTypes.func.isRequired,
   handleInput: PropTypes.func.isRequired,
