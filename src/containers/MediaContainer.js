@@ -129,39 +129,30 @@ class MediaBridge extends Component {
   }
 
   shareScreen() {
+    if (!this.pc) return
     const stm = this.localStream
+    const pc = this.pc
     const videoTrack = stm.getVideoTracks()[0]
-    const localStream = this.localStream
     const sendData = this.sendData
-    console.log("stm",stm)
     navigator.mediaDevices.getDisplayMedia({ cursor: true}).then( stream => {
       const screenTrack = stream.getTracks()[0]
-      console.log("shsc 1:",stm,screenTrack,videoTrack)
-      stm.removeTrack(videoTrack)
-      stm.addTrack(screenTrack)
-      console.log("shsc 2:",stm)
+      var sender = pc.getSenders().find(function(s) {
+        return s.track.kind == screenTrack.kind;
+      });
+      sender.replaceTrack(screenTrack);
       screenTrack.onended = function() {
-        console.log("shsc 3:",stm)
-        stm.removeTrack(screenTrack)
-        stm.addTrack(videoTrack)
-        console.log("shsc 4:",stm)
-        sendData({
-          peerMediaStream: {
-            video: localStream.getVideoTracks()[0].enabled
-          }
-        });        
-      }
-      sendData({
-        peerMediaStream: {
-          video: localStream.getVideoTracks()[0].enabled
-        }
-      });      
+        var sender = pc.getSenders().find(function(s) {
+          return s.track.kind == videoTrack.kind;
+        });
+        sender.replaceTrack(videoTrack);
+      }     
     })
   }
 
   handleError(e) {
     console.log("HandleError",e);
   }
+  
   init() {
     // wait for local media to be ready
     const attachMediaIfReady = () => {
