@@ -14,6 +14,7 @@ import 'react-toastify/dist/ReactToastify.css';
 class CommunicationContainer extends React.Component {
   constructor(props) {
     super(props);
+   
     this.state = {
       sid: '', // the other actor socket
       id: '', // this actor socket
@@ -32,7 +33,6 @@ class CommunicationContainer extends React.Component {
     this.handleInput = this.handleInput.bind(this);
     this.toggleVideo = this.toggleVideo.bind(this);
     this.toggleAudio = this.toggleAudio.bind(this);
-    this.shareScreen = this.shareScreen.bind(this);
     this.send = this.send.bind(this);
 
     this.signerAddress = null
@@ -256,38 +256,20 @@ class CommunicationContainer extends React.Component {
     this.props.setAudio(audio);
   }
 
-  shareScreen() {
-    const stm = this.localStream
-    const videoTrack = stm.getVideoTracks()[0]
-    console.log("stm",stm)
-    navigator.mediaDevices.getDisplayMedia({ cursor: true}).then( stream => {
-      const screenTrack = stream.getTracks()[0]
-      console.log("shsc 1:",stm,screenTrack,videoTrack)
-      stm.removeTrack(videoTrack)
-      stm.addTrack(screenTrack)
-      console.log("shsc 2:",stm)
-      screenTrack.onended = function() {
-        console.log("shsc 3:",stm)
-        stm.removeTrack(screenTrack)
-        stm.addTrack(videoTrack)
-        console.log("shsc 4:",stm)
-      }
-    })
-  }
-
-  async handleHangup() {
-    console.log("Hang up")
+  handleHangup() {
+    console.log("Hang up",this.props)
     this.props.media.hangup();
     this.setState({ minutes: 0 });
   }
   render(){
+    console.log("media",this.props.media)
     return (
       <Communication
         {...this.state}
         toggleVideo={this.toggleVideo}
         toggleAudio={this.toggleAudio}
-        shareScreen={this.shareScreen}
         send={this.send}
+        shareScreen ={this.props.media ? this.props.media.shareScreen : (x)=>x}
         sid={this.state ? this.state.id : ''}
         minutes={this.state.minutes}
         handleHangup={this.handleHangup}

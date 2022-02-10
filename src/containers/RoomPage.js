@@ -40,3 +40,33 @@ const mapDispatchToProps = (dispatch, ownProps) => (
     }
   );
 export default connect(mapStateToProps, mapDispatchToProps)(RoomPage);
+
+/*
+const roomPage = (props) => {
+  console.log("roomPage",props)
+    const [C2Mbridge, setC2mbridge] = useState({})
+
+    useEffect(() => {
+      props.addRoom();
+    },[])
+
+    const getUserMedia = navigator.mediaDevices.getUserMedia({
+      audio: true,
+      video: true
+    }).catch(e => alert('getUserMedia() error: ' + e.name))    
+
+   const socket = io( {
+    // WARNING: in that case, there is no fallback to long-polling
+    transports: [ "websocket" ] // or [ "websocket", "polling" ] (the order matters)
+    });
+    let media = 0
+    return (
+      <div>
+        <MediaContainer media={m => media = m}  socket={socket} getUserMedia={getUserMedia} />
+        <CommunicationContainer socket={socket} media={media} getUserMedia={getUserMedia} />
+      </div>
+    );
+}
+
+  export default roomPage
+  */
