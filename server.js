@@ -43,7 +43,6 @@ io.on('connection', socket => {
   console.log("connection")
   let room = '';
   let broadcaster_id = '';
-  let viewr_id = ''
   let fee = 0;
   let payment = 0;
   let interval = 0;
@@ -82,9 +81,8 @@ io.on('connection', socket => {
       broadcaster_id = socket.id;
       fee = stateObj.fee;
       interval = stateObj.interval;
-    } else if (sr.size === 1 && viewr_id == '') {
+    } else if (sr.size === 1) {
       socket.emit('join',{fee,interval,sid: broadcaster_id});
-      viewr_id = socket.id;
       payment = stateObj.payment
     } else { // max two clients
       socket.emit('full', room);
@@ -116,13 +114,7 @@ io.on('connection', socket => {
     console.log("addr_b",addr_b,sid,fee,data)
     data.bsid = socket.id;
     // sending to all clients in the room (channel) except sender
-    if (viewr_id == '') {
-      io.to(sid).emit('addr_b',data)
-      viewr_id = sid
-    }else{
-      io.to(sid).emit('hangup',"The Earner is currently busy :(")
-    }
-
+    io.to(sid).emit('addr_b',data)
     ///socket.broadcast.to(room).emit('addr_b', data);
   });
     
@@ -131,6 +123,12 @@ io.on('connection', socket => {
     data.sid = socket.id;
     // sending to all clients in the room (channel) except sender
     socket.broadcast.to(room).emit('approve', data);
+  });
+
+  socket.on('pending', sid => {
+    console.log("pending",sid)
+    // sending to all clients in the room (channel) except sender
+    socket.broadcast.to(room).emit('pending', sid);
   });
 
   socket.on('claim', (sid) => {
@@ -174,7 +172,6 @@ io.on('connection', socket => {
     console.log(await io.in(room).allSockets())
     io.to(sid).emit('hangup',message)
     //socket.emit('full')
-    viewr_id = ''
   });
   
   socket.on('leave', async () => {
@@ -189,8 +186,7 @@ io.on('connection', socket => {
       } 
       const Rooms2 = io.of("/").adapter.rooms;
       const Room2 = Array.from(Rooms2.get(room))    
-      console.log("VIEWR_ID_1",viewr_socket,room);
-      viewr_id = ''
+      console.log("leaave1",viewr_socket,room);
     }else {
       const rs =  await io.in(room).allSockets();
       if (rs.has(socket.id)){
