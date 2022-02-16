@@ -70,7 +70,13 @@ class CommunicationContainer extends React.Component {
       this.setState({id: props.id});
     });
 
-    socket.on('full', this.full);
+    socket.on('full', async ()=> {
+      console.log("FULL", this.props.media)
+      this.props.media.setState({bridge: 'full'});
+      toast("Broadcaster is accupied")
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      window.history.back()
+    });
 
     socket.on('bridge', props => {
       console.log("bridge",props)
@@ -112,6 +118,7 @@ class CommunicationContainer extends React.Component {
       toast(`SomeOne is considering a session for ${addr_v.payment} PPC.`, { autoClose: 2000, pauseOnHover: false })
       if (parseInt(state.fee) > parseInt(addr_v.payment)) {
         this.props.socket.emit('reject', sid, "You need to pay more.")
+        this.setState({ addr_v: null});
         return;
       }
 
@@ -182,6 +189,7 @@ class CommunicationContainer extends React.Component {
   approve = async (addr_b) => {
     console.log("SEND",addr_b, this.props.payment + '000000000',this.ppcToken) 
     //Set Allowance
+    toast.info("Waiting for your BSC wallet.")
     const ret = await this.ppcToken.approve(addr_b, this.props.payment + '000000000')
     this.props.socket.emit('transfer',this.state);
     toast.promise(
@@ -208,6 +216,7 @@ class CommunicationContainer extends React.Component {
     console.log("Accept",this.state.addr_v, this.signerAddress, this.state.payment + '000000000',store.fee,store.getState().fee)
     if (this.state.payment < store.fee) {
       this.props.socket.emit('reject', this.state.sid, "You need to pay more.");
+      this.setState({ addr_v: null});
       return;
     }
     const ret = await this.ppcToken.transferFrom(this.state.addr_v, this.signerAddress,  this.state.payment + '000000000')
@@ -229,6 +238,7 @@ class CommunicationContainer extends React.Component {
     }else{
       this.props.socket.emit('reject', this.state.sid, "You've been rejected by the Broadcaster.");
       this.hideAuth();
+      this.setState({ addr_v: null});
     }
   }
 
@@ -239,6 +249,7 @@ class CommunicationContainer extends React.Component {
       this.Accept()
     }else{
       this.props.socket.emit('reject', this.state.sid, "You've been rejected by the Broadcaster.");
+      this.setState({ addr_v: null});
     }
     this.hideAuth();  
   }
@@ -262,7 +273,6 @@ class CommunicationContainer extends React.Component {
     this.setState({ minutes: 0 });
   }
   render(){
-    console.log("media",this.props.media)
     return (
       <Communication
         {...this.state}

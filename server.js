@@ -86,7 +86,7 @@ io.on('connection', socket => {
       payment = stateObj.payment
     } else { // max two clients
       socket.emit('full', room);
-      socket.emit('hangup',"Chat Space is accupied");
+      //socket.emit('hangup',"Chat Space is accupied");
     }
   });
 
