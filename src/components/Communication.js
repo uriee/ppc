@@ -87,7 +87,7 @@ const Communication = props =>
       <Link  className="primary-button" to="/">OK</Link>
     </div>
     <div className="waiting">
-      <p><span>Waiting for a Viewer at:&nbsp;</span><a href={window.location.href+"/"+props.sid}>{window.location.href+"/"+props.sid}</a> </p>
+      <p><span>Waiting for a Viewer at:&nbsp;</span><a href={window.location.href.replace('/r/','/secure/')+"/"+props.sid}>{window.location.href.replace('/r/','/secure/')+"/"+props.sid}</a> </p>
     </div>
   </div>
 
