@@ -37,6 +37,7 @@ const mapDispatchToProps = (dispatch, ownProps) => (
       addRoom: () => {
         store.dispatch({ type: 'ADD_ROOM', room: ownProps.match.params.room})
         ownProps.match.params.chat_id && store.dispatch({ type: 'SET_CHATID', chatID:  ownProps.match.params.chat_id})
+        ownProps.match.params.fee && store.dispatch({ type: 'SET_FEE', fee:  ownProps.match.params.fee})
       }
     }
   );

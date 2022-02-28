@@ -14,7 +14,7 @@ render(
 		<BrowserRouter>
 			<Switch>
 				<Route exact path="/" component={Home} />
-				<Route path="/secure/:room/:chat_id" component={Room} />				
+				<Route path="/secure/:room/:fee/:chat_id" component={Room} />				
 				<Route path="/r/:room" component={Room} />
 				<Route path="*" component={NotFound} />
 			</Switch>
