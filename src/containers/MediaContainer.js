@@ -222,7 +222,6 @@ class MediaBridge extends Component {
         <ToastContainer autoClose={2000}/>
         <video className="remote-video" ref={(ref) => this.remoteVideo = ref} autoPlay></video>
         <video className="local-video" ref={(ref) => this.localVideo = ref} autoPlay muted></video>
-        <button className="share-screen" onClick={this.shareScreen} ></button>
       </div>
     );
   }
