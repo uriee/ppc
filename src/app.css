@@ -1,7 +1,211 @@
-body{
-    background: url(../img/bg/gradient-left-darker.png) repeat-y top left, url(../img/bg/gradient-right-darker.png) repeat-y top right, #1c004c
+@media (max-width: 767px) 
+{
+    #app-demo-contant {
+        width: 98vw;
+    }
 }
-body,
+
+
+:root {
+    --ctm-app-welcome-background: #42296E;
+    --ctm-app-front-color: #eda514;
+    --ctm-svg-border-button-hover-fill:#ffe9bb57;
+}
+
+body {
+    background: url(gradient-left.png) no-repeat top left, url(gradient-right.png) no-repeat top right, #320184;
+}
+
+#app-demo-main {
+    background-color:transparent;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    padding: auto;
+    width: 100%;
+    height: 100vh;
+    margin: auto;
+}
+
+#app-demo-contant {
+    margin: 2%;
+    min-width: 300px;
+    min-height: 400px;
+    width: 30%;
+    overflow:hidden;
+    display: block;
+}
+
+#app-welcome-page {
+    display:block;
+ }
+
+#app-create-page {
+    margin-top: 10%;
+    display:none;
+}
+
+#app-join-page {
+    margin-top: 10%;
+    display:none;
+}
+
+.app-cancel-button {
+    border: 2px solid var(--ctm-app-front-color);
+    border-radius: 100%;
+    width: 20;
+    margin-top: 2%;
+    margin-left: 2%;
+    margin-bottom: 2%;
+    background: transparent;
+    justify-content: center;
+float: right;
+}
+
+.app-cancel-button:hover  {
+    background-color: var(--ctm-svg-border-button-hover-fill);
+}
+
+.is-app-front-text {
+    font-size: larger;
+    color: var(--ctm-app-front-color);
+}
+
+.app-field-container {
+    padding: 2%;
+    margin-bottom: 4%;
+    width: 100%;
+    min-height: 40px;
+    display: grid;
+    grid-template-columns: 16% 78%;
+}
+
+.app-field-icon-container {
+    justify-content: center;
+    padding-right: 2%;
+    display: inline-block;
+}
+
+.app-field-icon {
+    display: block;
+   margin: 10%;
+    margin-bottom: 0%;
+}
+
+.app-field-text-container {
+    display: grid;
+    grid-template-rows: 50% 50%;
+    padding-left: 2%;
+}
+
+.app-field-title {
+    margin: 0%;
+    margin-top: auto;
+    color: var(--ctm-app-front-color);
+    font-size: large;
+    font-weight: bold;
+}
+
+.app-field-input {
+    margin: 0%;
+    border: none;
+    border-bottom: 1px solid var(--ctm-app-front-color);
+    background-color: transparent;
+    resize: none;
+    color: white;
+    font-size: medium;
+}
+
+.app-field-input:focus {
+    border: none;
+    border-bottom: 1px solid white;
+    outline: none;
+}
+
+#app-create-button-container{
+    padding: 2%;
+    margin-bottom: 4%;
+    width: 100%;
+    min-height: 40px;
+    display: grid;
+    grid-template-columns: 16% 16% 66%;
+    min-height: 0;  /* NEW */
+    min-width: 0;   /* NEW; needed for Firefox */
+}
+
+#app-join-button-container{
+    padding: 2%;
+    padding-right: 5%;
+    padding-left: 5%;
+    margin-bottom: 4%;
+    margin-top: 2%;
+    width: 98%;
+    min-height: 40px;
+    display: grid;
+    grid-template-columns: 16% 82%;
+    min-height: 0;  /* NEW */
+    min-width: 0;   /* NEW; needed for Firefox */
+}
+
+.app-page-title {
+    text-align: center;
+    width: 100%;
+    font-size: xx-large;
+    font-weight: bold;
+    margin-bottom: 5%;
+    clear: both;
+}
+
+
+
+
+#app-welcome-logo {
+    margin-top: 10%;
+    margin-bottom: 2%;
+    margin-left: 30%;
+    margin-right: 30%;
+}
+
+#app-welcome-title {
+    text-align: center;
+    width: 100%;
+    font-size: x-large;
+    font-weight: bold;
+}
+
+#app-welcome-subtitle {
+    text-align: center;
+    width: 100%;
+    margin-bottom: 10%;
+}
+
+#app-welcome-or-text {
+    text-align: center;
+    width: 100%;
+}
+
+.app-welcome-button {
+    border: 2px solid var(--ctm-app-front-color);
+    border-radius: 20px;
+    background: transparent;
+    margin-left: 5%;
+    margin-right: 5%;
+    margin-bottom: 2%;
+    margin-top: 2%;
+    width: 90%;
+    min-height: 40px;
+}
+
+.app-welcome-button:hover  {
+    background-color: var(--ctm-svg-border-button-hover-fill);
+}
+
+#app-welcome-or-text {
+    text-align: center;
+    width: 100%;
+}
+
+
 input,
 button {
     font-size: 1.6vw;
@@ -9,7 +213,6 @@ button {
     font-family: Sans-Serif;
 }
 @media(max-width: 1024px) {
-    body,
     input,
     button {
         font-size: 1em;
