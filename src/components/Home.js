@@ -3,7 +3,7 @@ import { PropTypes } from 'prop-types';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import store from '../store'
-
+import getBlockchain from '../../ethereum.js';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -110,18 +110,21 @@ const Home = (props) => {
     updateIsBroadcaster(!isBroadcaster);
   }
 
-/*
+
   useEffect(() => {
-    const pageloader = document.getElementById('pageloader');
-    const infraloader = document.getElementById('infraloader');
-    pageloader.classList.toggle('is-active');
-    var pageloaderTimeout = setTimeout(function () {
-        infraloader.classList.remove('is-active');
-        pageloader.classList.toggle('is-active');
-        clearTimeout(pageloaderTimeout);
-    }, 1200); 
+    const init = async () => {
+      let { ppcToken } = await getBlockchain(toast);
+
+      if(!ppcToken){
+        toast.error(`No wallet Detected`)
+        await new Promise(resolve => setTimeout(resolve, 4000));
+        window.location.assign("https:/cryptomeet.me")
+      }
+
+    };
+    init(); 
   }, []);
- */
+
 
   return (
 

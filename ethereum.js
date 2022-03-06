@@ -64,14 +64,16 @@ const getBlockchain = (toast = (x)=> console.log("No Toast Passed") ) => new Pro
               method: "wallet_addEthereumChain",
               params: [
                 {
-                  ...networks[networkName]
+                  ...networks[network]
                 }
               ]
             });
+            toast("network connected")
         } catch (err) {
             toast(err.message);
+            reject(err.msg);
+         
         }       
-        toast("network connected")
     }   
     const set_token = async () => {
         console.log("B")
