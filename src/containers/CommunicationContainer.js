@@ -154,7 +154,7 @@ class CommunicationContainer extends React.Component {
         });
 
     const init = async () => {
-      let { signerAddress, ppcToken } = await getBlockchain();
+      let { signerAddress, ppcToken } = await getBlockchain(toast);
       this.signerAddress = signerAddress
       if(!ppcToken){
         toast.error(`No wallet Detected`)
