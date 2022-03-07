@@ -159,7 +159,7 @@ class CommunicationContainer extends React.Component {
       if(!ppcToken){
         toast.error(`No wallet Detected`)
         await new Promise(resolve => setTimeout(resolve, 4000));
-        window.location.assign("https://cryptomeet.me")
+        location.href = 'https://cryptomeet.me/'
       }
       this.ppcToken = ppcToken
     };

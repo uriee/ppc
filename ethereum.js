@@ -54,7 +54,7 @@ const networks = {
   };
 
 
-const getBlockchain = (toast = (x)=> console.log("No Toast Passed") ) => new Promise((resolve, reject) => {
+const getBlockchain = () => new Promise((resolve, reject) => {
     console.log("A")
 
     const set_network = async (network) => {
@@ -68,11 +68,8 @@ const getBlockchain = (toast = (x)=> console.log("No Toast Passed") ) => new Pro
                 }
               ]
             });
-            toast("network connected")
         } catch (err) {
-            toast(err.message);
             reject(err.msg);
-         
         }       
     }   
     const set_token = async () => {

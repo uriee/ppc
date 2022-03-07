@@ -113,12 +113,14 @@ const Home = (props) => {
 
   useEffect(() => {
     const init = async () => {
-      let { ppcToken } = await getBlockchain(toast);
+      let { ppcToken } = await getBlockchain(toast).catch((x) => ({ppcToken : 0}));
 
       if(!ppcToken){
         toast.error(`No wallet Detected`)
         await new Promise(resolve => setTimeout(resolve, 4000));
-        window.location.assign("https:/cryptomeet.me")
+        location.href = 'https://cryptomeet.me/'
+      }else{
+        toast("Wallet Connected :)")
       }
 
     };
@@ -128,75 +130,9 @@ const Home = (props) => {
 
   return (
 
-/*    
-    <div className="home">
-          <div id="pageloader" className="pageloader is-left-to-right is-theme"></div>
-          <div id="infraloader" className="infraloader is-active"></div>
-        <div>
-          <h1 className="title is-1 is-light is-semibold is-spaced main-title">CrypToMeet.me</h1>
-          <h1 className="subtitle is-5 is-light is-thin">
-          <div>
-              <Switch  isOn={isBroadcaster} onColor="#3f00fc"  handleToggle={handleRoleChange}/>
-            </div>
-          </h1>
-          <ToastContainer />
-
-
-          <form className="contact-form">
-
-            <div className="control-material is-secondary">      
-                <input type="text" name="room" value={ roomID } onChange={handleroomIDChange} pattern="^\w+$" maxLength="10" required autoFocus title="Room name should only contain letters or numbers."/>
-                <span className="material-highlight"></span>
-                <span className="bar"></span>
-                <label>Room Name.</label>
-            </div>
-           
-            {isBroadcaster ? (
-              <div>
-              <div className="control-material is-secondary">
-                  <input type="number" name="interval" value={interval} onChange={handleIntervalChange} pattern="^\d+$" maxLength="3" required autoFocus title="The durationof the session in minutes."/>       
-                  <span className="material-highlight"></span>
-                  <span className="bar"></span>
-                  <label>Duration of each Session</label>
-              </div>
-
-              <div className="control-material is-secondary"> 
-                  <input type="number" name="fee" value={fee} onChange={handleFeeChange} pattern="^\d+$" maxLength="10" required autoFocus title="Payment in PPI tokens per Session."/> 
-                  <span className="material-highlight"></span>
-                  <span className="bar"></span>
-                  <label>Cost of session in PPI Token. </label>
-              </div>
-              </div>
-              ) : (
-              <div>
-              <div className="control-material is-secondary">      
-                  <input type="number" name="payment" value={payment} onChange={handlePaymentChange} pattern="^\d+$" maxLength="10" required autoFocus title="tokens"/>
-                  <span className="material-highlight"></span>
-                  <span className="bar"></span>
-                  <label>I'm Willing to Pay</label>
-              </div>
-
-              <div className="control-material is-secondary">
-              <input type="text" name="chatID" value={chatID} onChange={handlechatIDChange} maxLength="50" autoFocus title="Ensure authenticity with chat id"/>
-                  <span className="material-highlight"></span>
-                  <span className="bar"></span>
-                  <label>Ensure authenticity with chat id </label>
-              </div> 
-              </div>                                   
-              )}  
-            <div className="has-text-centered">
-                <Link className="button is-button k-button k-primary raised has-gradient is-fat is-bold is-submit" to={ '/r/' + roomID }>
-                    <span className="text">Start/Join</span>
-                    <span className="front-gradient"></span>
-                </Link>
-            </div>
-          </form>
-        </div>
-    </div>
-    */
 
     <div id="app-demo-main">
-
+        <ToastContainer />
         <div id="app-demo-contant">
             <div id="app-welcome-page">
 
