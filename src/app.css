@@ -13,7 +13,7 @@
 }
 
 body {
-    background: url(gradient-left.png) no-repeat top left, url(gradient-right.png) no-repeat top right, #320184;
+    background: url(../img/bg/gradient-left.png) no-repeat top left, url(../img/bg/gradient-right.png) no-repeat top right, #320184;
 }
 
 #app-demo-main {
