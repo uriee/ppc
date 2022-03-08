@@ -17,17 +17,20 @@ class HomePage extends Component {
   }
 
   render(){
+    let byLink = 0;
     if (this.params.room) {
       this.params.chat_id && store.dispatch({ type: 'SET_CHATID', chatID:  this.params.chat_id})
       this.params.fee && store.dispatch({ type: 'SET_FEE', fee:  this.params.fee})
       this.params.fee && store.dispatch({ type: 'SET_PAYMENT', payment:  this.params.fee})
       this.params.room && store.dispatch({ type: 'SET_ROOMID', roomID:  this.params.room})
+      byLink = 1;
     }
     return (
       <Home
         defaultRoomId={this.defaultRoomId}
         roomId={this.state.roomId}
         handleIdChange={this.handleIdChange}
+        byLink={byLink}
       />
     );
   }

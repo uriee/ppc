@@ -125,6 +125,7 @@ const Home = (props) => {
 
     };
     init(); 
+    if (props.byLink) appNavToJoin();
   }, []);
 
 
@@ -196,7 +197,7 @@ const Home = (props) => {
     
             </div>
             <div id="app-join-page">
-                <button className="app-cancel-button is-app-front-text" onClick={ appNavToWelcome}>X</button>
+                {!props.byLink && <button className="app-cancel-button is-app-front-text" onClick={appNavToWelcome}>X</button>}   
                 <p className="app-page-title is-app-front-text">Join a Meeting</p>
 
                 <div className="app-field-container">
