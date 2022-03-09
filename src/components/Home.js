@@ -1,38 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { PropTypes } from 'prop-types';
-import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import store from '../store'
 import getBlockchain from '../../ethereum.js';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from 'react-toastify';
 
 import logo from '../../img/C17bLogoBaseRobiconStatic.svg';
 import token_svg from '../../img/C29Token.svg';
 import lock_svg from '../../img/C28Lock.svg';
 import cam_svg from '../../img/C28Cam.svg';
-
-const Switch = ({ isOn, handleToggle, onColor }) => {
-  return (
-    <div style={{marginBottom: '50px'}}>
-      <input
-        checked={isOn}
-        onChange={handleToggle}
-        className="react-switch-checkbox"
-        id={`react-switch-new`}
-        type="checkbox"
-       // style={{marginTop: '30px',marginBottom: '30px'}}
-      />
-      <label
-        style={{ background: isOn && onColor }}
-        className="react-switch-label"
-        htmlFor={`react-switch-new`}
-      >{isOn ? (<span style={{padding: '5px'}}>Broadcaster</span>) : (<span style={{position: 'absolute', right: '0px', padding: '5px'}}>Viewr</span>)}
-        <span className={`react-switch-button`} />
-      </label>
-    </div>
-  );
-};
 
 function appNavToCreate() {
   document.getElementById('app-welcome-page').style.display = 'none';
@@ -52,31 +27,14 @@ function appNavToWelcome() {
   document.getElementById('app-welcome-page').style.display = 'block';
 } 
 
-function appCreateMeeting() {
-
-  var name = document.getElementById('create-meeting-name-input').value;
-  var charge = document.getElementById('create-meeting-charge-input').value;
-  var duration = document.getElementById('create-meeting-duration-input').value;
-
-  window.alert(name + charge + duration);
-}
-
-function appJoinMeeting() {
-
-  var name = document.getElementById('join-meeting-name-input').value;
-  var charge = document.getElementById('join-meeting-pay-input').value;
-  var duration = document.getElementById('join-meeting-id-input').value;
-
-  window.alert(name + charge + duration);
-}
-
 const Home = (props) => {
-  const [interval, updateInterval] = useState(props.interval);
-  const [fee, updateFee] = useState(props.fee);
-  const [payment, updatePayment] = useState(props.payment);
-  const [chatID, updatechatID] = useState(props.chatID);  
-  const [roomID, updateroomID] = useState(props.roomID);   
-  const [isBroadcaster, updateIsBroadcaster] = useState(props.isBroadcaster);
+  const globalState = store.getState();
+
+  const [interval, updateInterval] = useState(globalState.interval);
+  const [fee, updateFee] = useState(globalState.fee);
+  const [payment, updatePayment] = useState(globalState.payment);
+  const [chatID, updatechatID] = useState(globalState.chatID);  
+  const [roomID, updateroomID] = useState(globalState.roomID);   
 
 
   function handleroomIDChange(e) {
@@ -105,12 +63,6 @@ const Home = (props) => {
     store.dispatch({ type: 'SET_CHATID', chatID:  e.target.value})
   }
 
-  function handleRoleChange(e) {
-    store.dispatch({ type: 'SET_ISBROADCASTER', isBroadcaster:  !isBroadcaster})
-    updateIsBroadcaster(!isBroadcaster);
-  }
-
-
   useEffect(() => {
     const init = async () => {
       let { ppcToken } = await getBlockchain(toast).catch((x) => ({ppcToken : 0}));
@@ -133,7 +85,6 @@ const Home = (props) => {
 
 
     <div id="app-demo-main">
-        <ToastContainer />
         <div id="app-demo-contant">
             <div id="app-welcome-page">
 
@@ -248,29 +199,4 @@ const Home = (props) => {
     );
 }
 
-Home.propTypes = {
-  handleIdChange: PropTypes.func.isRequired,
-  defaultRoomId: PropTypes.string.isRequired,
-  roomId: PropTypes.string.isRequired,
-  rooms: PropTypes.array.isRequired
-};
-
-const mapStateToProps = store => {
-  return {rooms: store.rooms};
-}
-
-const mapDispatchToProps = (dispatch, ownProps) => {
-  const state = store.getState();
-
-  return (
-  {
-    roomID: state.roomID,
-    chatID: state.chatID,
-    fee: state.fee,
-    interval: state.interval,
-    payment: state.payment,
-    isBroadcaster: state.isBroadcaster
-  }
-)};
-
-export default connect(mapStateToProps, mapDispatchToProps)(Home);
+export default Home;
