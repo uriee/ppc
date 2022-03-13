@@ -421,6 +421,7 @@ input {
 }
 .established + .auth .hangup-button {
     display: flex;
+
 }
 
 .ibox {
@@ -781,3 +782,4 @@ input {
     margin: 5%;
   }
   
+

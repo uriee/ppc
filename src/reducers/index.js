@@ -10,7 +10,6 @@ import chatIDReducer from './chatid-reducer';
 import roomIDReducer from './roomid-reducer';
 import ownerReducer from './owner-reducer';
 import tokenReducer from './token-reducer';
-import isBroadcasterReducer from './isBroadcaster-reducer';
 
 // Combine Reducers
 const reducers = combineReducers({
@@ -24,6 +23,5 @@ const reducers = combineReducers({
   roomID: roomIDReducer,  
   owner: ownerReducer,
   token: tokenReducer,
-  isBroadcaster: isBroadcasterReducer,
 });
 export default reducers;
