@@ -40,6 +40,42 @@ class CommunicationContainer extends React.Component {
 
   }
 
+spenderMMConfirm()
+{
+  const { owner } = store.getState();
+ if(!owner) {
+   var smm = document.getElementById("spenderMMActionNeeded");
+   var s2 = document.getElementById("sStage2");
+
+   smm.classList.remove("isActive");
+   smm.classList.add("isDone");
+   s2.classList.add("isActive");
+ }else{
+   var e1 = document.getElementById("eStage1");
+   var e2 = document.getElementById("eStage2");
+   e1.classList.remove("isActive")
+   e1.classList.add("isCompact");
+   e2.classList.add("isActive");
+ }
+}
+
+earnerMMConfirm() {
+  const { owner } = store.getState();
+  if(!owner){
+   var s3 = document.getElementById("sStage3");
+   var s4 = document.getElementById("sStage4");
+   s3.classList.remove("isActive");
+   s3.classList.add("isDone");
+   s4.classList.add("isActive");
+  }else{
+   var emm = document.getElementById("earnerMMActionNeeded");
+   var e4 = document.getElementById("eStage4");
+   emm.classList.remove("isActive");
+   emm.classList.add("isDone");
+   e4.classList.add("isActive");
+  }
+}
+
   hideAuth() {
     console.log("HIDE")
     this.props.media.setState({bridge: 'connecting'});
@@ -103,6 +139,12 @@ class CommunicationContainer extends React.Component {
       await new Promise(resolve => setTimeout(resolve, 3000));
       window.history.back()
       
+    });
+
+    socket.on('claim', () => {
+      console.log("claim");
+      this.earnerMMConfirm();
+      toast("Broadcaster is claiming tokens 22", { autoClose: 2000, pauseOnHover: false })
     });    
 
     socket.on('approve', ({ message, sid }) => {
@@ -140,6 +182,7 @@ class CommunicationContainer extends React.Component {
     socket.on('transfer', (props) => {
       console.log("transfer:",props);
       toast("Viewr is transfering tokens", { autoClose: 2000, pauseOnHover: false })
+      this.spenderMMConfirm()
       socket.emit('lock',props)
     });      
 

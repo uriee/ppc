@@ -472,3 +472,312 @@ input {
   .react-switch-label:active .react-switch-button {
     width: 60px;
   }
+
+  #mainChatContainer {
+    margin: 5%;
+    width: 100%;
+    height: 100vh;
+    display: grid;
+    grid-template-columns: 45%  45% 10%;
+  }
+  
+  .chat {
+    margin-left: 5%;
+    max-width: 50%;
+    display: flex;
+    flex-flow: column;
+    justify-content: start;
+  }
+  
+  .chatTitleContainer {
+    border-radius: 30px;
+    background-color: var(--ctm-app-welcome-background);
+    padding: 2% 5%;
+    max-height: fit-content;
+  
+    display: block;
+    align-self: center;
+    align-content: center;
+  }
+  
+  .chatTitleContainer > .chatTitle {
+    font-size: large;
+    color: var( --ctm-app-front-color);
+    width: 100%;
+    text-align: center;
+  }
+  
+  .chatTitleContainer > .chatSubtitle {
+    font-size: large;
+    color: var( --ctm-app-front-color);
+  }
+  
+  .chatStage {
+    display: block;
+    width: 70%;
+    border-radius: 30px;
+    background-color: var(--ctm-app-welcome-background);
+    padding: 0%;
+    min-height: 5%;
+    align-self: center;
+    align-content: center;
+    margin: 2%;
+    transition: width 0.5s ease-out;
+  }
+  
+  .stageContent {
+    /* border: 1px solid gray; */
+    display: flex;
+    flex-wrap: wrap;
+    align-items:center;
+    border-radius: 26px;
+    padding: 2%;
+    padding-left: 4%;
+    padding-right: 4%;
+  }
+  
+  .stageTitle {
+    display: inline-block;
+    color: gray;
+    width: 100%;
+    text-align: center;
+  }
+  
+  .stageSubtitle {
+    display: none;
+    font-size: medium;
+  }
+  
+  .stageInfo {
+    display: none;
+    font-size: small;
+  }
+  
+  .stageDoneTitle {
+    display: none;
+    color: gray;
+    width: 80%;
+    text-align: center;
+    margin-left: 2%;
+  }
+  
+  .stageProgress {
+    max-width: 10%;
+    display: none;
+    align-self: center;
+  }
+  
+  .stageActionButton {
+    border: 1px solid var(--ctm-app-front-color);
+    color: var(--ctm-app-front-color);
+    font-size: medium;
+    border-radius: 20px;
+    background: transparent;
+    width: 100%;
+    margin-bottom: 2%;
+    margin-top: 4%;
+    min-height: 40px;
+    padding-left: 5%;
+    padding-right: 5%;
+    display: none;
+    align-self:center;
+    animation-name: buttonShineAnimation;
+    animation-duration: 2s;
+    animation-timing-function: ease-out;
+    animation-iteration-count: infinite;
+  }
+  
+  @keyframes buttonShineAnimation{
+    0%   {border-color: var(--ctm-app-front-color);}
+    50%   {border-color:  var(--ctm-stage-button-shine-border);}
+    100%   {border-color: var(--ctm-app-front-color);}
+  }
+  
+  .stageActionButton:hover  {
+    background-color: var(--ctm-stage-button-hover-fill);
+  }
+  
+  
+  
+  .comTextInput {
+    margin: 2%;
+    margin-left: 15%;
+    margin-top: 4%;
+    border: none;
+    border-bottom: 1px solid var(--ctm-app-front-color);
+    background-color: transparent;
+    resize: none;
+    color: white;
+    font-size: medium;
+    width: 80%;
+    display: none;
+  
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    overflow-x:auto;
+  }
+  
+  .comTextInput:focus {
+    border: none;
+    border-bottom: 1px solid white;
+    outline: none;
+  }
+  
+  #meetingLink {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    overflow-x:auto;
+  }
+  
+  #earnerSpendrMessage {
+      overflow-wrap: break-word;
+    word-wrap: break-word;
+    overflow-x:auto;
+  }
+  
+  .chatStage.isActive {
+    width: 98%;
+    /* min-height: 20vh; */
+  }
+  
+  .chatStage.isActive .stageContent{
+    border: 1px solid var(--ctm-app-front-color);
+  }
+  
+  .chatStage.isActive .stageProgress {
+    content:url("../img/C32CtmLogoProgressIndicator.svg");
+    display: inline-block;
+  }
+  
+  .chatStage.isActive .stageTitle {
+    color: var(--ctm-app-front-color);
+    transition: color 0.5 ease-out;
+    margin: 2%;
+    margin-bottom: 2%;
+    font-size: large;
+    width: auto;
+    padding-left: 5%;
+  }
+  
+  .chatStage.isActive .comTextInput{
+    display: block;
+  }
+  
+  .chatStage.isActive .stageSubtitle {
+    color: var(--ctm-app-front-color);
+    margin: 2%;
+    margin-bottom: 2%;
+    margin-left: 15%;
+    display: block;
+  }
+  
+  .chatStage.isActive .stageInfo {
+    color: var(--ctm-app-front-color);
+    margin: 2%;
+    margin-bottom: 2%;
+    margin-left: 15%;
+    display: block;
+  }
+  
+  .chatStage.isActive .stageActionButton {
+    display: inline-block;
+  }
+  
+  .chatStage.isDone .stageProgress {
+    content:url("../img/done.svg");
+    display: inline-block;
+    max-width: 3%;
+  }
+  
+  .chatStage.isDone .stageTitle {
+    display: none;
+  }
+  
+  .chatStage.isDone .stageActionButton {
+    display: none;
+  }
+  
+  .chatStage.isDone .stageDoneTitle {
+    display: inline-block;
+  }
+  
+  .chatStage.isDone .comTextInput {
+    pointer-events:none;
+  }
+  
+  
+  .chatStage.isCompact .stageActionButton {
+    display: none;
+  }
+  
+  .chatStage.isCompact .stageTitle {
+    color: var(--ctm-app-front-color);
+    transition: color 0.5 ease-out;
+    margin: 2%;
+    font-size: small;
+  }
+  
+  .chatStage.isCompact #meetingLink {
+    color: var(--ctm-app-front-color);
+    font-size: small;
+  }
+  
+  #eStage1.isCompact:hover {
+    width: 98%;
+  }
+  
+  #eStage1.isCompact:hover .stageActionButton{
+    display: block;
+  }
+  
+  #eStage1.isCompact:hover #meetingLink{
+    display: block;
+  }
+  
+  
+  #spenderChat {
+    opacity: 0;
+    }
+  
+  #simulation {
+    margin-left: 2%;
+  }
+  
+  #simulation p {
+    color: var(--ctm-app-front-color);
+  }
+  
+  #simulation button {
+    margin: 6%;
+  }
+  
+  #spenderChat.isActive {
+  opacity: 1;
+  }
+  
+  #earnerMMsim {
+    display:none;
+  }
+  
+  #earnerMMsim.isActive {
+    display: inline-block;
+  }
+  
+  #spenderMMsim {
+    display:none;
+  }
+  
+  #spenderMMsim.isActive {
+    display: inline-block;
+  }
+  
+  #mainChatContainer {display:none}
+  #mainChatContainer.isActive {display:grid}
+  
+  #camSim {display: none;}
+  #camSim.isActive {
+    display: block;
+    width: 10%;
+    margin: 5%;
+  }
+  
