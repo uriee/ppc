@@ -75,6 +75,35 @@ earnerMMConfirm() {
    e4.classList.add("isActive");
   }
 }
+ moneyOnTheTable() {
+  const { owner } = store.getState();
+  if(!owner){
+    var s2 = document.getElementById("sStage2");
+    var s3 = document.getElementById("sStage3");
+    s2.classList.remove("isActive");
+    s2.classList.add("isDone");
+    s3.classList.add("isActive");
+  }else{
+    var e2 = document.getElementById("eStage2");
+    var e3 = document.getElementById("eStage3");
+    e2.classList.toggle("isActive");
+    e2.classList.add("isDone");
+    e3.classList.add("isActive");
+  }
+ }
+
+ startMeeting() {
+  const { owner } = store.getState();
+  if(!owner){
+    var s4 = document.getElementById("sStage4");
+    s4.classList.remove("isActive");
+    s4.classList.add("isDone");
+  }else{
+    var e4 = document.getElementById("eStage4");
+    e4.classList.remove("isActive");
+    e4.classList.add("isDone");
+  }
+ } 
 
   hideAuth() {
     console.log("HIDE")
@@ -245,6 +274,7 @@ earnerMMConfirm() {
       }
     )
     const confirmation = await ret.wait()
+
     console.log("SEND 3",confirmation)
     if (confirmation.status === 1) {
       this.props.socket.emit('auth', this.state);

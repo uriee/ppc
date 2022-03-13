@@ -33,10 +33,59 @@ const Communication = props => {
   const url = window.location.href.replace('/r/','/secure/')
   const link = `${url}/${fee}/${props.sid}`
 
+ const initEarnerChat = () => 
+{
+  var e1 = document.getElementById("eStage1");
+  var e2 = document.getElementById("eStage2");
+  var e3 = document.getElementById("eStage3");
+  var e4 = document.getElementById("eStage4");
+  var emm = document.getElementById("earnerMMActionNeeded");
 
-  const sendJoinRequest = () => 0
-  const getTheMoney = () => 0
-  const ernerDecline = () => 0
+  e1.classList.remove("isCompact", "isDone", "isActive");
+  e2.classList.remove("isCompact", "isDone", "isActive");
+  e3.classList.remove("isCompact", "isDone", "isActive");
+  e4.classList.remove("isCompact", "isDone", "isActive");
+  emm.classList.remove("isCompact", "isDone", "isActive");
+
+  e1.classList.add("isActive");
+
+  var smms = document.getElementById("earnerMMsim");
+    smms.classList.remove("isActive")
+}
+const initSpenderChat = () => {
+  var s1 = document.getElementById("sStage1");
+  var s2 = document.getElementById("sStage2");
+  var s3 = document.getElementById("sStage3");
+  var s4 = document.getElementById("sStage4");
+  var smm = document.getElementById("spenderMMActionNeeded");
+
+  s1.classList.remove("isCompact", "isDone", "isActive");
+  s2.classList.remove("isCompact", "isDone", "isActive");
+  s3.classList.remove("isCompact", "isDone", "isActive");
+  s4.classList.remove("isCompact", "isDone", "isActive");
+  smm.classList.remove("isCompact", "isDone", "isActive");
+  s1.classList.add("isActive");
+
+  var smms = document.getElementById("spenderMMsim");
+    smms.classList.remove("isActive")
+}
+
+const initCom = () => owner ? initEarnerChat() : initSpenderChat()
+
+  const sendJoinRequest = () => {
+    var s1 = document.getElementById("sStage1");
+    s1.classList.remove("isActive");
+    s1.classList.add("isDone");
+   }  
+
+  const getTheMoney = () => {
+    var e3 = document.getElementById("eStage3");
+    e3.classList.toggle("isActive");
+    e3.classList.add("isDone");
+   }  
+
+  const ernerDecline = () => initCom()
+  
   const copyLink = () => {alert("link copy")}
 
   const earner = () => (<div id="earnerChet" className="chat">
@@ -105,7 +154,7 @@ const Communication = props => {
           <p className="chatTitle">Welcome Spender</p>
         </div>
   
-        <div id="sStage1" classNmae="chatStage isActive">
+        <div id="sStage1" className="chatStage isActive">
           <div className="stageContent">
             <img className="stageProgress"/>
             <p className="stageTitle">Massage Payment</p>
@@ -115,7 +164,7 @@ const Communication = props => {
             - Your willing to pay value: 500 CTMs</p>
             <p className="stageInfo">Earner can accept or decline your offer.</p>
             <input id="spenderMessage" type="text" className="comTextInput" placeholder="Enter short message"/>				
-            <Button className="stageActionButton" onClick={sendJoinRequest}>Send Payment and Message</Button>
+            <button className="stageActionButton" onClick={sendJoinRequest}>Send Payment and Message</button>
             <p className="stageDoneTitle">Massage Payment</p>          
           </div>
         </div>  
@@ -154,7 +203,7 @@ const Communication = props => {
 
   return (
       <div className="auth">
-        {owner ? earner() : earner()}
+        {owner ? earner() : spender()}
         <div className="media-controls">
           <Link className="call-exit-button" to="/" onClick={props.handleHangup}>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36"  className="svg">

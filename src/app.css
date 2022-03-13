@@ -484,7 +484,7 @@ input {
   
   .chat {
     margin-left: 5%;
-    max-width: 50%;
+    max-width: 30%;
     display: flex;
     flex-flow: column;
     justify-content: start;
