@@ -483,6 +483,7 @@ input {
   }
   
   .chat {
+    opacity: 0.5;
     margin-left: 5%;
     max-width: 30%;
     display: flex;
@@ -683,6 +684,10 @@ input {
   .chatStage.isActive .stageActionButton {
     display: inline-block;
   }
+
+  .hidden {
+    visibility: hidden;
+  }
   
   .chatStage.isDone .stageProgress {
     content:url("../img/done.svg");
@@ -737,7 +742,7 @@ input {
   
   
   #spenderChat {
-    opacity: 0;
+    opacity: 0.75;
     }
   
   #simulation {

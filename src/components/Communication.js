@@ -7,6 +7,7 @@ import store from '../store'
 import done_svg from '../../img/done.svg';
 //import alone_svg from '../../img/alone.svg';
 import progress_svg from '../../img/C32CtmLogoProgressIndicator.svg';
+import { toast } from 'react-toastify';
 
 const Timer = ({ minutes }) => {
   const [timeLeft, setTimeLeft] = useState(minutes * 60);
@@ -33,119 +34,72 @@ const Communication = props => {
   const url = window.location.href.replace('/r/','/secure/')
   const link = `${url}/${fee}/${props.sid}`
 
- const initEarnerChat = () => 
-{
-  var e1 = document.getElementById("eStage1");
-  var e2 = document.getElementById("eStage2");
-  var e3 = document.getElementById("eStage3");
-  var e4 = document.getElementById("eStage4");
-  var emm = document.getElementById("earnerMMActionNeeded");
+  const copyLink = () => {
+    navigator.clipboard.writeText(link).then(function() {
+      toast("Link Copied.")
+    }, function() {
+      toast("Failed. use menual copy.")
+    });
+  }
 
-  e1.classList.remove("isCompact", "isDone", "isActive");
-  e2.classList.remove("isCompact", "isDone", "isActive");
-  e3.classList.remove("isCompact", "isDone", "isActive");
-  e4.classList.remove("isCompact", "isDone", "isActive");
-  emm.classList.remove("isCompact", "isDone", "isActive");
-
-  e1.classList.add("isActive");
-
-  var smms = document.getElementById("earnerMMsim");
-    smms.classList.remove("isActive")
-}
-const initSpenderChat = () => {
-  var s1 = document.getElementById("sStage1");
-  var s2 = document.getElementById("sStage2");
-  var s3 = document.getElementById("sStage3");
-  var s4 = document.getElementById("sStage4");
-  var smm = document.getElementById("spenderMMActionNeeded");
-
-  s1.classList.remove("isCompact", "isDone", "isActive");
-  s2.classList.remove("isCompact", "isDone", "isActive");
-  s3.classList.remove("isCompact", "isDone", "isActive");
-  s4.classList.remove("isCompact", "isDone", "isActive");
-  smm.classList.remove("isCompact", "isDone", "isActive");
-  s1.classList.add("isActive");
-
-  var smms = document.getElementById("spenderMMsim");
-    smms.classList.remove("isActive")
-}
-
-const initCom = () => owner ? initEarnerChat() : initSpenderChat()
-
-  const sendJoinRequest = () => {
-    var s1 = document.getElementById("sStage1");
-    s1.classList.remove("isActive");
-    s1.classList.add("isDone");
-   }  
-
-  const getTheMoney = () => {
-    var e3 = document.getElementById("eStage3");
-    e3.classList.toggle("isActive");
-    e3.classList.add("isDone");
-   }  
-
-  const ernerDecline = () => initCom()
-  
-  const copyLink = () => {alert("link copy")}
-
-  const earner = () => (<div id="earnerChet" className="chat">
-
-  <div className="chatTitleContainer">
-    <p className="chatTitle">Welcome Earner</p>
-  </div>
-  
-  <div id="eStage1" className="chatStage isActive">
+  const earner = () => (
+  <div id="earnerChet" className="chat">
+    <div className="chatTitleContainer">
+      <p className="chatTitle">Welcome Earner</p>
+    </div>
+    
+    <div id="eStage1" className="chatStage isActive">
+      <div className="stageContent">
+        <img className="stageProgress"/>
+        <p className="stageTitle">Share meeting link</p>
+        <p className="stageSubtitle">publishing the meeting link. let spenders reach you.</p>
+        <p id="meetingLink" className="stageSubtitle">{link}</p>
+        <button className="stageActionButton" onClick={copyLink}>Copy meeting link</button>
+      </div>
+    </div>
+    
+    <div id="eStage2" className="chatStage">
+    <div className="stageContent">
+      <img className="stageProgress"/> 
+      <p className="stageTitle">Spender Transfering CTMs</p>
+      <p className="stageDoneTitle">Money is on the table</p>
+    </div> 
+    </div>
+    <div id="eStage3" className="chatStage">
     <div className="stageContent">
       <img className="stageProgress"/>
-      <p className="stageTitle">Share meeting link</p>
-      <p className="stageSubtitle">publishing the meeting link. let spenders reach you.</p>
-      <p id="meetingLink" className="stageSubtitle">{link}</p>
-      <button className="stageActionButton" onClick={copyLink}>Copy meeting link</button>
+      <p className="stageTitle">Accept payment and Start meeting</p>
+    
+      <p className="stageSubtitle" >Spender say:</p>
+      <p id="earnerSpendrMessage" className="stageSubtitle"></p>
+    
+      <p className="stageSubtitle" >Spender is willing to pay:</p>
+      <p id="earnerSpenderPayment" className="stageSubtitle"></p>
+    
+      <p className="stageInfo">You can accept or decline the offer.</p>
+    
+    
+      <button className="stageActionButton" onClick={props.handleInvitation} data-ref="accept" >Accept & Start</button>
+      <button className="stageActionButton" onClick={props.handleInvitation} data-ref="reject" >Decline</button>
+      <p className="stageDoneTitle">Payment Accepted</p>
     </div>
-  </div>
-  
-  <div id="eStage2" className="chatStage">
-  <div className="stageContent">
-    <img className="stageProgress"/> 
-    <p className="stageTitle">Spender Transfering CTMs</p>
-    <p className="stageDoneTitle">Money is on the table</p>
-  </div> 
-  </div>
-  <div id="eStage3" className="chatStage">
-  <div className="stageContent">
-    <img className="stageProgress"/>
-    <p className="stageTitle">Accept payment and Start meeting</p>
-  
-    <p className="stageSubtitle" >Spender say:</p>
-    <p id="earnerSpendrMessage" className="stageSubtitle"></p>
-  
-    <p className="stageSubtitle" >Spender is willing to pay:</p>
-    <p id="earnerSpenderPayment" className="stageSubtitle"></p>
-  
-    <p className="stageInfo">You can accept or decline the offer.</p>
-  
-  
-    <button className="stageActionButton" onClick={getTheMoney}>Accept & Start</button>
-    <button className="stageActionButton" onClick={ernerDecline}>Decline</button>
-    <p className="stageDoneTitle">Payment Accepted</p>
-  </div>
-  </div>
-  <div id="earnerMMActionNeeded" className="chatStage">
-  <div className="stageContent">
-    <img className="stageProgress"/>
-    <p className="stageTitle">Meta Mask Confermation</p>
-    <p className="stageSubtitle">plaese confirm the transaction on Meta Mask</p>
-    <p className="stageDoneTitle">CTMs transaction confirmed</p>
-  </div>
-  </div>
-  <div id="eStage4" className="chatStage">
-  <div className="stageContent">
-    <img className="stageProgress"/>
-    <p className="stageTitle">Transfering CTMs to Earner</p>
-    <p className="stageDoneTitle">Payment complited - Strating the meeting...</p>
-  </div> 
-  </div>
-  
+    </div>
+    <div id="earnerMMActionNeeded" className="chatStage">
+    <div className="stageContent">
+      <img className="stageProgress"/>
+      <p className="stageTitle">Meta Mask Confermation</p>
+      <p className="stageSubtitle">plaese confirm the transaction on Meta Mask</p>
+      <p className="stageDoneTitle">CTMs transaction confirmed</p>
+    </div>
+    </div>
+    <div id="eStage4" className="chatStage">
+    <div className="stageContent">
+      <img className="stageProgress"/>
+      <p className="stageTitle">Transfering CTMs to Earner</p>
+      <p className="stageDoneTitle">Payment complited - Strating the meeting...</p>
+    </div> 
+    </div>
+    
   </div>)
   
   const spender = () => (
@@ -161,10 +115,10 @@ const initCom = () => owner ? initEarnerChat() : initSpenderChat()
             <p className="stageSubtitle" >Please send short message.<br/><br/>
             Earner will get:<br/>
             - The massage<br/>
-            - Your willing to pay value: 500 CTMs</p>
+            - Your willing to pay value: {props.payment}</p>
             <p className="stageInfo">Earner can accept or decline your offer.</p>
-            <input id="spenderMessage" type="text" className="comTextInput" placeholder="Enter short message"/>				
-            <button className="stageActionButton" onClick={sendJoinRequest}>Send Payment and Message</button>
+            <input id="spenderMessage" type="text" className="comTextInput" onChange={props.handleInput} data-ref="message" placeholder="Enter short message"/>				
+            <button className="stageActionButton" onClick={props.send}>Send Payment and Message</button>
             <p className="stageDoneTitle">Massage Payment</p>          
           </div>
         </div>  
@@ -201,6 +155,7 @@ const initCom = () => owner ? initEarnerChat() : initSpenderChat()
     </div>
   )
 
+  useEffect(()=> props.initCom(),[])
   return (
       <div className="auth">
         {owner ? earner() : spender()}

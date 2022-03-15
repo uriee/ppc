@@ -40,23 +40,21 @@ class CommunicationContainer extends React.Component {
 
   }
 
-spenderMMConfirm()
-{
-  const { owner } = store.getState();
- if(!owner) {
-   var smm = document.getElementById("spenderMMActionNeeded");
-   var s2 = document.getElementById("sStage2");
-
-   smm.classList.remove("isActive");
-   smm.classList.add("isDone");
-   s2.classList.add("isActive");
- }else{
+spenderMMConfirm_e(){
    var e1 = document.getElementById("eStage1");
    var e2 = document.getElementById("eStage2");
    e1.classList.remove("isActive")
    e1.classList.add("isCompact");
    e2.classList.add("isActive");
- }
+}
+
+spenderMMConfirm_s()
+{
+   var smm = document.getElementById("spenderMMActionNeeded");
+   var s2 = document.getElementById("sStage2");
+   smm.classList.remove("isActive");
+   smm.classList.add("isDone");
+   s2.classList.add("isActive");
 }
 
 earnerMMConfirm() {
@@ -75,23 +73,6 @@ earnerMMConfirm() {
    e4.classList.add("isActive");
   }
 }
- moneyOnTheTable() {
-  const { owner } = store.getState();
-  if(!owner){
-    var s2 = document.getElementById("sStage2");
-    var s3 = document.getElementById("sStage3");
-    s2.classList.remove("isActive");
-    s2.classList.add("isDone");
-    s3.classList.add("isActive");
-  }else{
-    var e2 = document.getElementById("eStage2");
-    var e3 = document.getElementById("eStage3");
-    e2.classList.toggle("isActive");
-    e2.classList.add("isDone");
-    e3.classList.add("isActive");
-  }
- }
-
  startMeeting() {
   const { owner } = store.getState();
   if(!owner){
@@ -105,10 +86,65 @@ earnerMMConfirm() {
   }
  } 
 
+
+initCom(){
+  const { owner } = store.getState();
+  let chat = document.getElementsByClassName('chat')[0]
+  console.log("Fuck",chat);
+  chat && (chat.style.display = 'flex')
+  if (owner) { 
+    var e1 = document.getElementById("eStage1");
+    var e2 = document.getElementById("eStage2");
+    var e3 = document.getElementById("eStage3");
+    var e4 = document.getElementById("eStage4");
+    var emm = document.getElementById("earnerMMActionNeeded");
+  
+    e1.classList.remove("isCompact", "isDone", "isActive");
+    e2.classList.remove("isCompact", "isDone", "isActive");
+    e3.classList.remove("isCompact", "isDone", "isActive");
+    e4.classList.remove("isCompact", "isDone", "isActive");
+    emm.classList.remove("isCompact", "isDone", "isActive");
+    e1.classList.add("isActive");
+  }else{
+    var s1 = document.getElementById("sStage1");
+    var s2 = document.getElementById("sStage2");
+    var s3 = document.getElementById("sStage3");
+    var s4 = document.getElementById("sStage4");
+    var smm = document.getElementById("spenderMMActionNeeded");
+  
+    s1.classList.remove("isCompact", "isDone", "isActive");
+    s2.classList.remove("isCompact", "isDone", "isActive");
+    s3.classList.remove("isCompact", "isDone", "isActive");
+    s4.classList.remove("isCompact", "isDone", "isActive");
+    smm.classList.remove("isCompact", "isDone", "isActive");
+    s1.classList.add("isActive");    
+  }
+}
+
   hideAuth() {
     console.log("HIDE")
     this.props.media.setState({bridge: 'connecting'});
   } 
+
+  moneyOnTheTable_s() {
+      var s2 = document.getElementById("sStage2");
+      var s3 = document.getElementById("sStage3");
+      s2.classList.remove("isActive");
+      s2.classList.add("isDone");
+      s3.classList.add("isActive");
+   }  
+
+   moneyOnTheTable_e() {
+      var e2 = document.getElementById("eStage2");
+      var e3 = document.getElementById("eStage3");
+      var earnerSpendrMessage = document.getElementById("earnerSpendrMessage");
+      e2.classList.toggle("isActive");
+      e2.classList.add("isDone");
+      e3.classList.add("isActive");
+      earnerSpendrMessage.innerHTML = this.state.message//'fuck this shit';
+      earnerSpenderPayment.innerHTML = this.state.payment//"500 CTMs";
+      console.log("mot e end",this.state.message)
+   }    
 
   full() {
     console.log("FULL", this.props.media)
@@ -118,7 +154,6 @@ earnerMMConfirm() {
 
   componentDidMount() {
     const socket = this.props.socket;
-
     this.setState({video: this.props.video, audio: this.props.audio, id: socket.id});
     const state = store.getState();
     const stateObj = {
@@ -146,11 +181,15 @@ earnerMMConfirm() {
     socket.on('bridge', props => {
       console.log("bridge",props)
       props.interval && this.setState({ minutes: props.interval });
-      this.props.media.init()
+      const chat = document.getElementsByClassName('chat')[0]
+      chat.style.display = 'none'
+      this.props.media.init() 
     });
 
     socket.on('hangup', async (message) => {
       console.log("Hangup minuts = 0")   
+      const chat = document.getElementsByClassName('chat')[0]
+      this.initCom()
       this.setState({ minutes: 0 });
     });    
 
@@ -179,6 +218,7 @@ earnerMMConfirm() {
     socket.on('approve', ({ message, sid }) => {
       console.log("approve",message,sid)
       this.props.media.setState({bridge: 'approve'});
+      this.moneyOnTheTable_e()
       this.setState({ message, sid });
     });
 
@@ -211,7 +251,7 @@ earnerMMConfirm() {
     socket.on('transfer', (props) => {
       console.log("transfer:",props);
       toast("Viewr is transfering tokens", { autoClose: 2000, pauseOnHover: false })
-      this.spenderMMConfirm()
+      this.spenderMMConfirm_e()
       socket.emit('lock',props)
     });      
 
@@ -254,6 +294,11 @@ earnerMMConfirm() {
       }
       this.props.socket.emit('addr_v', obj);
       this.hideAuth();
+      var s1 = document.getElementById("sStage1");
+      var smm = document.getElementById("spenderMMActionNeeded");    
+      s1.classList.remove("isActive");
+      s1.classList.add("isDone");
+      smm.classList.add("isActive");      
     }
   }
 
@@ -273,15 +318,18 @@ earnerMMConfirm() {
         autoClose: 2000, pauseOnHover: false
       }
     )
+    this.spenderMMConfirm_s()
     const confirmation = await ret.wait()
 
     console.log("SEND 3",confirmation)
     if (confirmation.status === 1) {
       this.props.socket.emit('auth', this.state);
       this.hideAuth();
+      this.moneyOnTheTable_s()
     }
     else{
       this.setState({update: this.state.update +1})
+      this.initCom()
     }
   }
 
@@ -315,17 +363,39 @@ earnerMMConfirm() {
     }
   }
 
+  getTheMoney(e)  {
+    this.Accept()    
+    var e3 = document.getElementById("eStage3");
+    var emm = document.getElementById("earnerMMActionNeeded");    
+    e3.classList.toggle("isActive");
+    e3.classList.add("isDone");
+    emm.classList.add("isActive");    
+   }  
+
+  ernerDecline() {
+    this.props.socket.emit('reject', this.state.sid, "You've been rejected by the Broadcaster.");
+    this.setState({ addr_v: null});    
+    this.initCom()  
+  }
+
   handleInvitation(e) {
     e.preventDefault();
     console.log("HaNDLE INVETITION",e.target.dataset.ref)
     if (e.target.dataset.ref == 'accept') {
       this.Accept()
+      var e3 = document.getElementById("eStage3");
+      var emm = document.getElementById("earnerMMActionNeeded");    
+      e3.classList.toggle("isActive");
+      e3.classList.add("isDone");
+      emm.classList.add("isActive");      
     }else{
       this.props.socket.emit('reject', this.state.sid, "You've been rejected by the Broadcaster.");
       this.setState({ addr_v: null});
+      this.initCom()
     }
     this.hideAuth();  
   }
+
 
   toggleVideo() {
     console.log("TOGGLE V")
@@ -357,6 +427,7 @@ earnerMMConfirm() {
         minutes={this.state.minutes}
         handleHangup={this.handleHangup}
         handleInput={this.handleInput}
+        initCom={this.initCom}
         handleInvitation={this.handleInvitation} />
     );
   }
