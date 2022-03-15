@@ -8,6 +8,8 @@
 
 :root {
     --ctm-app-welcome-background: #42296E;
+    --ctm-app-chat-background: #42296ecb;
+
     --ctm-app-front-color: #eda514;
     --ctm-svg-border-button-hover-fill:#ffe9bb57;
 }
@@ -475,15 +477,12 @@ input {
   }
 
   #mainChatContainer {
-    margin: 5%;
     width: 100%;
-    height: 100vh;
-    display: grid;
-    grid-template-columns: 45%  45% 10%;
+    min-width: 90%;
+    display: block;
   }
   
   .chat {
-    opacity: 0.5;
     margin-left: 5%;
     max-width: 30%;
     display: flex;
@@ -493,13 +492,12 @@ input {
   
   .chatTitleContainer {
     border-radius: 30px;
-    background-color: var(--ctm-app-welcome-background);
-    padding: 2% 5%;
+    background-color: var(--ctm-app-chat-background);
     max-height: fit-content;
-  
     display: block;
     align-self: center;
     align-content: center;
+    padding: 0% 2%;
   }
   
   .chatTitleContainer > .chatTitle {
@@ -518,12 +516,12 @@ input {
     display: block;
     width: 70%;
     border-radius: 30px;
-    background-color: var(--ctm-app-welcome-background);
+    background-color: var(--ctm-app-chat-background);
     padding: 0%;
     min-height: 5%;
     align-self: center;
     align-content: center;
-    margin: 2%;
+    margin: 1%;
     transition: width 0.5s ease-out;
   }
   
@@ -533,9 +531,16 @@ input {
     flex-wrap: wrap;
     align-items:center;
     border-radius: 26px;
-    padding: 2%;
     padding-left: 4%;
     padding-right: 4%;
+  }
+
+  .stageProgress {
+    display: none;
+  }
+
+  .stageDoneImg {
+    display: none;
   }
   
   .stageTitle {
@@ -644,10 +649,15 @@ input {
   
   .chatStage.isActive .stageContent{
     border: 1px solid var(--ctm-app-front-color);
+    padding: 2%;
+  }
+
+  .chatStage.isActive .chatTitleContainer{
+    width: 98%;
+    padding: 2%;
   }
   
   .chatStage.isActive .stageProgress {
-    content:url("../img/C32CtmLogoProgressIndicator.svg");
     display: inline-block;
   }
   
@@ -689,8 +699,7 @@ input {
     visibility: hidden;
   }
   
-  .chatStage.isDone .stageProgress {
-    content:url("../img/done.svg");
+  .chatStage.isDone .stageDoneImg {
     display: inline-block;
     max-width: 3%;
   }
@@ -712,6 +721,11 @@ input {
   }
   
   
+  .chatStage.isCompact .stageDoneImg {
+    display: inline-block;
+    max-width: 3%;
+  }
+
   .chatStage.isCompact .stageActionButton {
     display: none;
   }
@@ -740,10 +754,7 @@ input {
     display: block;
   }
   
-  
-  #spenderChat {
-    opacity: 0.75;
-    }
+
   
   #simulation {
     margin-left: 2%;
@@ -776,9 +787,7 @@ input {
   #spenderMMsim.isActive {
     display: inline-block;
   }
-  
-  #mainChatContainer {display:none}
-  #mainChatContainer.isActive {display:grid}
+
   
   #camSim {display: none;}
   #camSim.isActive {
