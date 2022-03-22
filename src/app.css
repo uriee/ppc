@@ -27,8 +27,8 @@ body {
     justify-content: center;
     padding: auto;
     width: 100%;
-    height: 100vh;
     margin: auto;
+    height: 100%;
 }
 
 #app-demo-contant {
@@ -36,9 +36,8 @@ body {
     min-width: 300px;
     min-height: 400px;
     width: 30%;
-    overflow:hidden;
     display: block;
-    margin-bottom: 5%;
+    margin-bottom: 2%;
 }
 
 #app-footer {
@@ -79,6 +78,7 @@ body {
   color: var(--ctm-app-link);
   cursor: pointer;
   pointer-events: bounding-box;
+  font-size: small;
 }
 
 .app-footer-link:hover {
@@ -136,18 +136,19 @@ body {
     margin: 0%;
     margin-top: auto;
     color: var(--ctm-app-front-color);
-    font-size: large;
+    font-size: medium;
     /* font-weight: bold; */
 }
 
 .app-field-input {
     margin: 0%;
+    margin-top: 1%;
     border: none;
     border-bottom: 1px solid var(--ctm-app-front-color);
     background-color: transparent;
     resize: none;
     color: white;
-    font-size: larger;
+    font-size: medium;
 }
 
 .app-field-input:focus {
@@ -162,8 +163,8 @@ body {
   background: transparent;
   margin-left: 5%;
   margin-right: 5%;
-  margin-bottom: 2%;
-  margin-top: 2%;
+  margin-bottom: 4%;
+  margin-top: 0%;
   width: 70%;
   display:inline-block;
   text-align: center;
@@ -198,7 +199,7 @@ body {
   width: 100%;
   min-height: 40px;
   display: grid;
-  grid-template-columns: 16% 16% 66%;
+  grid-template-columns: 16% 16% 64%;
   min-height: 0;  /* NEW */
   min-width: 0;   /* NEW; needed for Firefox */
 
@@ -218,14 +219,11 @@ body {
 
 #app-join-button-container{
     padding: 2%;
-    padding-right: 5%;
-    padding-left: 5%;
     margin-bottom: 4%;
-    margin-top: 2%;
-    width: 98%;
+    width: 100%;
     min-height: 40px;
     display: grid;
-    grid-template-columns: 16% 82%;
+    grid-template-columns: 16% 16% 64%;
     min-height: 0;  /* NEW */
     min-width: 0;   /* NEW; needed for Firefox */
 }
@@ -233,7 +231,7 @@ body {
 .app-page-title {
     text-align: center;
     width: 100%;
-    font-size: xx-large;
+    font-size: x-large;
     /* font-weight: bold; */
     margin-bottom: 5%;
     clear: both;
@@ -244,38 +242,45 @@ body {
 
 #app-welcome-logo {
     margin-top: 10%;
-    margin-left: 35%;
-    margin-right: 35%;
+    margin-left: 40%;
+    margin-right: 40%;
 }
 
 #app-welcome-title {
     text-align: center;
     width: 100%;
-    font-size: x-large;
+    font-size: large;
     /* font-weight: bold; */
 }
 
 #app-welcome-subtitle {
     text-align: center;
     width: 100%;
-    margin-bottom: 10%;
+    margin: 0px;
+    margin-bottom: 16%;
+    font-size: medium;
 }
 
 #join-text-line {
   margin: 10%;
+  margin-top: 0%;
+  font-size: medium;
 }
 
 #app-welcome-or-text {
     text-align: center;
+    font-size: small;
     width: 100%;
 }
 
 .app-welcome-button {
-    border: 2px solid var(--ctm-app-front-color);
+    border: 1px solid var(--ctm-app-front-color);
     border-radius: 20px;
     background: transparent;
     margin-left: 10%;
     margin-right: 10%;
+    margin-top: 1%;
+    margin-bottom: 1%;
     width: 80%;
     min-height: 40px;
     padding: 2%;
@@ -284,6 +289,26 @@ body {
 
 .app-welcome-button:hover  {
     background-color: var(--ctm-svg-border-button-hover-fill);
+}
+
+.app-action-button {
+  border: 1px solid var(--ctm-app-front-color);
+  border-radius: 20px;
+  background: transparent;
+  margin-left: 10%;
+  margin-right: 10%;
+  margin-top: 10%;
+  width: 80%;
+  min-height: 40px;
+  padding: 2%;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.app-action-button:hover  {
+  background-color: var(--ctm-svg-border-button-hover-fill);
 }
 
 

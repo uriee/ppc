@@ -146,7 +146,7 @@ const Home = (props) => {
                     <div className="app-field-icon-container">
                         <img className="app-field-icon" src={cam_svg} alt=""/>
                     </div>
-                    <Link className="app-welcome-button is-app-front-text" to={ '/r/' + roomID }>Start</Link>                      
+                    <Link className="app-action-button is-app-front-text" to={ '/r/' + roomID }>Start</Link>                      
 
                 </div>
     
@@ -192,7 +192,8 @@ const Home = (props) => {
                     <div className="app-field-icon-container">
                         <img className="app-field-icon" src={cam_svg} alt=""/>
                     </div>
-                        <Link  to={ '/r/' + roomID } className="app-welcome-button is-app-front-text" >Join</Link>
+                    <div></div>
+                        <Link  to={ '/r/' + roomID } className="app-action-button is-app-front-text" >Join</Link>
                 </div>
     
             </div>
