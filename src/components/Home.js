@@ -86,7 +86,7 @@ const Home = (props) => {
 
   return (
 
-
+ 
     <div id="app-demo-main">
         <div id="app-demo-contant">
             <div id="app-welcome-page">
@@ -205,14 +205,14 @@ const Home = (props) => {
                         <a className="app-footer-link" href="#">Buy CTMs</a>
         
                         <a className="app-footer-link" href="#">Site</a>
- 
+
                         <a className="app-footer-link" href="#">Help</a>
         
                 </div>
             </div>
         </div>
     </div>   
-       
+     
     );
 }
 

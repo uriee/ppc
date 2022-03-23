@@ -11,13 +11,27 @@
     --ctm-app-chat-background: #42296ecb;
     --ctm-app-link: #3e8cf1;
 
-    --ctm-app-front-color: #eda514e3;
+    --ctm-app-front-color: #eda514;
     --ctm-svg-border-button-hover-fill:#ffe9bb57;
 }
 
 body {
     background: url(../img/bg/gradient-left.png) no-repeat top left, url(../img/bg/gradient-right.png) no-repeat top right, #320184;
 }
+
+#app-welcome-container {
+  display: table-cell;
+  width: 100%;
+  height: 100%;
+  vertical-align: middle;
+  text-align: center;
+}
+
+#app-welcome-inner {
+  display: inline-block;
+  width: 100%; height: 100%;
+}
+
 
 #app-demo-main {
     background-color:transparent;
