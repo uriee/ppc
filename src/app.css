@@ -9,6 +9,7 @@
 :root {
     --ctm-app-welcome-background: #42296E;
     --ctm-app-chat-background: #42296ecb;
+    --ctm-app-link: #3e8cf1;
 
     --ctm-app-front-color: #eda514;
     --ctm-svg-border-button-hover-fill:#ffe9bb57;
@@ -18,15 +19,30 @@ body {
     background: url(../img/bg/gradient-left.png) no-repeat top left, url(../img/bg/gradient-right.png) no-repeat top right, #320184;
 }
 
+#app-welcome-container {
+  display: table-cell;
+  width: 100%;
+  height: 100%;
+  vertical-align: middle;
+  text-align: center;
+}
+
+#app-welcome-inner {
+  display: inline-block;
+  width: 100%; height: 100%;
+}
+
+
 #app-demo-main {
     background-color:transparent;
     align-items: center;
     display: flex;
+    flex-flow: column;
     justify-content: center;
     padding: auto;
     width: 100%;
-    height: 100vh;
     margin: auto;
+    height: 100%;
 }
 
 #app-demo-contant {
@@ -34,17 +50,31 @@ body {
     min-width: 300px;
     min-height: 400px;
     width: 30%;
-    overflow:hidden;
     display: block;
+    margin-bottom: 2%;
+}
+
+#app-footer {
+  min-width: 300px;
+  min-height: 40px;
+  width: 30%;
+  overflow:hidden;
+  display: block;
 }
 
 #app-welcome-page {
-    display:block;
+    flex-flow: column;
+    justify-content: center;
+    padding: auto;
+    width: 100%;
  }
 
 #app-create-page {
-    margin-top: 10%;
-    display:none;
+  flex-flow: column;
+  justify-content: center;
+  padding: auto;
+  width: 100%;
+  display:none;
 }
 
 #app-join-page {
@@ -52,20 +82,36 @@ body {
     display:none;
 }
 
+.footer-links {
+    display: flex;
+    justify-content:space-evenly;
+    align-items: stretch;
+}
+
+.app-footer-link  {
+  color: var(--ctm-app-link);
+  cursor: pointer;
+  pointer-events: bounding-box;
+  font-size: small;
+}
+
+.app-footer-link:hover {
+  color: white;
+}
+
 .app-cancel-button {
-    border: 2px solid var(--ctm-app-front-color);
-    border-radius: 100%;
-    width: 20;
     margin-top: 2%;
     margin-left: 2%;
     margin-bottom: 2%;
     background: transparent;
-    justify-content: center;
-float: right;
+    float: right;
+    width: 26px;
+    height: 26px;
+    display: block;
 }
 
 .app-cancel-button:hover  {
-    background-color: var(--ctm-svg-border-button-hover-fill);
+    color: var(--ctm-app-link);
 }
 
 .is-app-front-text {
@@ -104,12 +150,13 @@ float: right;
     margin: 0%;
     margin-top: auto;
     color: var(--ctm-app-front-color);
-    font-size: large;
-    font-weight: bold;
+    font-size: medium;
+    /* font-weight: bold; */
 }
 
 .app-field-input {
     margin: 0%;
+    margin-top: 1%;
     border: none;
     border-bottom: 1px solid var(--ctm-app-front-color);
     background-color: transparent;
@@ -124,27 +171,73 @@ float: right;
     outline: none;
 }
 
+.app-action-link {
+  border: 2px solid var(--ctm-app-front-color);
+  border-radius: 20px;
+  background: transparent;
+  margin-left: 5%;
+  margin-right: 5%;
+  margin-bottom: 4%;
+  margin-top: 0%;
+  width: 70%;
+  display:inline-block;
+  text-align: center;
+  align-content: center;
+}
+
+#app-create-link {
+  border: 2px solid var(--ctm-app-front-color);
+  border-radius: 20px;
+  background: transparent;
+  margin-left: 5%;
+  margin-right: 5%;
+  margin-bottom: 2%;
+  margin-top: 2%;
+  width: 50%;
+  display:inline-block;
+  text-align: center;
+  align-content: center;
+  align-self: center;
+  padding: 2%;
+}
+
+.app-action-link-text {
+  width: 100%;
+  background-color: #42296E;
+  text-align: center;
+}
+
 #app-create-button-container{
+  padding: 2%;
+  margin-bottom: 4%;
+  width: 100%;
+  min-height: 40px;
+  display: grid;
+  grid-template-columns: 16% 16% 64%;
+  min-height: 0;  /* NEW */
+  min-width: 0;   /* NEW; needed for Firefox */
+
+}
+
+#app-join-a-meeting {
+  color: var(--ctm-app-link);
+  cursor: pointer;
+  pointer-events: bounding-box;
+  margin-left: 1%;
+  margin-right: 1%;
+}
+
+#app-join-a-meeting:hover {
+  color: white;
+}
+
+#app-join-button-container{
     padding: 2%;
     margin-bottom: 4%;
     width: 100%;
     min-height: 40px;
     display: grid;
-    grid-template-columns: 16% 16% 66%;
-    min-height: 0;  /* NEW */
-    min-width: 0;   /* NEW; needed for Firefox */
-}
-
-#app-join-button-container{
-    padding: 2%;
-    padding-right: 5%;
-    padding-left: 5%;
-    margin-bottom: 4%;
-    margin-top: 2%;
-    width: 98%;
-    min-height: 40px;
-    display: grid;
-    grid-template-columns: 16% 82%;
+    grid-template-columns: 16% 16% 64%;
     min-height: 0;  /* NEW */
     min-width: 0;   /* NEW; needed for Firefox */
 }
@@ -152,8 +245,8 @@ float: right;
 .app-page-title {
     text-align: center;
     width: 100%;
-    font-size: xx-large;
-    font-weight: bold;
+    font-size: x-large;
+    /* font-weight: bold; */
     margin-bottom: 5%;
     clear: both;
 }
@@ -163,48 +256,73 @@ float: right;
 
 #app-welcome-logo {
     margin-top: 10%;
-    margin-bottom: 2%;
-    margin-left: 30%;
-    margin-right: 30%;
+    margin-left: 40%;
+    margin-right: 40%;
 }
 
 #app-welcome-title {
     text-align: center;
     width: 100%;
-    font-size: x-large;
-    font-weight: bold;
+    font-size: large;
+    /* font-weight: bold; */
 }
 
 #app-welcome-subtitle {
     text-align: center;
     width: 100%;
-    margin-bottom: 10%;
+    margin: 0px;
+    margin-bottom: 16%;
+    font-size: medium;
+}
+
+#join-text-line {
+  margin: 10%;
+  margin-top: 0%;
+  font-size: medium;
 }
 
 #app-welcome-or-text {
     text-align: center;
+    font-size: small;
     width: 100%;
 }
 
 .app-welcome-button {
-    border: 2px solid var(--ctm-app-front-color);
+    border: 1px solid var(--ctm-app-front-color);
     border-radius: 20px;
     background: transparent;
-    margin-left: 5%;
-    margin-right: 5%;
-    margin-bottom: 2%;
-    margin-top: 2%;
-    width: 90%;
+    margin-left: 10%;
+    margin-right: 10%;
+    margin-top: 1%;
+    margin-bottom: 1%;
+    width: 80%;
     min-height: 40px;
+    padding: 2%;
+    text-align: center;
 }
 
 .app-welcome-button:hover  {
     background-color: var(--ctm-svg-border-button-hover-fill);
 }
 
-#app-welcome-or-text {
-    text-align: center;
-    width: 100%;
+.app-action-button {
+  border: 1px solid var(--ctm-app-front-color);
+  border-radius: 20px;
+  background: transparent;
+  margin-left: 10%;
+  margin-right: 10%;
+  margin-top: 10%;
+  width: 80%;
+  min-height: 40px;
+  padding: 2%;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.app-action-button:hover  {
+  background-color: var(--ctm-svg-border-button-hover-fill);
 }
 
 

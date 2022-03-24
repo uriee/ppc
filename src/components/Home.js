@@ -4,10 +4,13 @@ import store from '../store'
 import getBlockchain from '../../ethereum.js';
 import { toast } from 'react-toastify';
 
-import logo from '../../img/C17bLogoBaseRobiconStatic.svg';
-import token_svg from '../../img/C29Token.svg';
-import lock_svg from '../../img/C28Lock.svg';
-import cam_svg from '../../img/C28Cam.svg';
+import logo from '../../img/C34Logo.svg';
+import logo_svg from '../../img/C34LogodBold.svg';
+import token_svg from '../../img/C34TokenBold.svg';
+import lock_svg from '../../img/C34LockBold.svg';
+import cam_svg from '../../img/C34CamBold.svg';
+import clock_svg from '../../img/C34ClockBold.svg';
+import x_svg from '../../img/C34x.svg';
 
 function appNavToCreate() {
   document.getElementById('app-welcome-page').style.display = 'none';
@@ -83,7 +86,7 @@ const Home = (props) => {
 
   return (
 
-
+ 
     <div id="app-demo-main">
         <div id="app-demo-contant">
             <div id="app-welcome-page">
@@ -93,17 +96,18 @@ const Home = (props) => {
                 <p id="app-welcome-subtitle" className="is-app-front-text">private. direct pay. video chat.</p>
 
                 <button className="app-welcome-button is-app-front-text" onClick={appNavToCreate}>Create a Meeting</button>
-                <p id="app-welcome-or-text" className="is-app-front-text">or</p>
-                <button className="app-welcome-button is-app-front-text" onClick={appNavToJoin}>Join a Meeting</button>
-
+                <div id="join-text-line">
+                <p id="app-welcome-or-text" className="is-app-front-text">or click <span id="app-join-a-meeting" onClick={appNavToJoin}>join a meeting</span> by meeting ID or meeting Name.</p>
+                </div>
             </div>
+
             <div id="app-create-page">
-                <button className="app-cancel-button is-app-front-text" onClick={appNavToWelcome}>X</button>
+                <img className="app-cancel-button" onClick={appNavToWelcome} src={x_svg}></img>
                 <p className="app-page-title is-app-front-text">Create a Meeting</p>
 
                 <div className="app-field-container">
                     <div className="app-field-icon-container">
-                        <img className="app-field-icon" src={logo} alt=""/>
+                        <img className="app-field-icon" src={logo_svg} alt=""/>
                     </div>
 
                     <div className="app-field-text-container">
@@ -125,7 +129,7 @@ const Home = (props) => {
 
                 <div className="app-field-container">
                     <div className="app-field-icon-container">
-                        <img className="app-field-icon" src={logo} alt=""/>
+                        <img className="app-field-icon" src={clock_svg} alt=""/>
                     </div>
 
                     <div className="app-field-text-container">
@@ -136,24 +140,24 @@ const Home = (props) => {
 
                 <div id="app-create-button-container">
         
-                    <div className="app-field-icon-container">
+                <div className="app-field-icon-container">
                         <img className="app-field-icon" src={lock_svg} alt=""/>
                     </div>
                     <div className="app-field-icon-container">
                         <img className="app-field-icon" src={cam_svg} alt=""/>
                     </div>
-                    <Link className="app-welcome-button is-app-front-text" to={ '/r/' + roomID }>Start</Link>                      
+                    <Link className="app-action-button is-app-front-text" to={ '/r/' + roomID }>Start</Link>                      
 
                 </div>
     
             </div>
             <div id="app-join-page">
-                {!props.byLink && <button className="app-cancel-button is-app-front-text" onClick={appNavToWelcome}>X</button>}   
+                {!props.byLink &&<img className="app-cancel-button" onClick={appNavToWelcome} src={x_svg}></img>}   
                 <p className="app-page-title is-app-front-text">Join a Meeting</p>
 
                 <div className="app-field-container">
                     <div className="app-field-icon-container">
-                        <img className="app-field-icon" src={logo} alt=""/>
+                        <img className="app-field-icon" src={logo_svg} alt=""/>
                     </div>
 
                     <div className="app-field-text-container">
@@ -188,14 +192,27 @@ const Home = (props) => {
                     <div className="app-field-icon-container">
                         <img className="app-field-icon" src={cam_svg} alt=""/>
                     </div>
-                        <Link  to={ '/r/' + roomID } className="app-welcome-button is-app-front-text" >Join</Link>
+                    <div></div>
+                        <Link  to={ '/r/' + roomID } className="app-action-button is-app-front-text" >Join</Link>
                 </div>
     
             </div>
         </div>
+        <div id="app-footer">
+            <div id="app-footer-contant">
+                <div className="footer-links">
 
+                        <a className="app-footer-link" href="#">Buy CTMs</a>
+        
+                        <a className="app-footer-link" href="#">Site</a>
+
+                        <a className="app-footer-link" href="#">Help</a>
+        
+                </div>
+            </div>
+        </div>
     </div>   
-       
+     
     );
 }
 
