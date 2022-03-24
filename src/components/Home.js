@@ -10,7 +10,7 @@ import token_svg from '../../img/C34TokenBold.svg';
 import lock_svg from '../../img/C34LockBold.svg';
 import cam_svg from '../../img/C34CamBold.svg';
 import clock_svg from '../../img/C34ClockBold.svg';
-import x_svg from '../../img/C34x.svg';
+import x_svg from '../../img/C34X.svg';
 
 function appNavToCreate() {
   document.getElementById('app-welcome-page').style.display = 'none';
