@@ -30,7 +30,7 @@ const Timer = ({ minutes }) => {
 
 
 const Communication = props => {
-  const {fee, owner} = store.getState();
+  const {fee, owner ,payment} = store.getState();
   const url = window.location.href.replace('/r/','/secure/')
   const link = `${url}/${fee}/${props.sid}`
 
@@ -44,10 +44,7 @@ const Communication = props => {
 
   const earner = () => (
   <div id="earnerChet" className="chat">
-    <div className="chatTitleContainer">
-      <p className="chatTitle">Welcome Earner</p>
-    </div>
-    
+   
     <div id="eStage1" className="chatStage isActive">
       <div className="stageContent">
         <img className="stageProgress" src={progress_svg}/>
@@ -74,12 +71,12 @@ const Communication = props => {
       <p className="stageTitle">Accept payment and Start meeting</p>
     
       <p className="stageSubtitle" >Spender say:</p>
-      <p id="earnerSpendrMessage" className="stageSubtitle"></p>
+      <p className="stageSubtitle">{props.message}</p>
     
       <p className="stageSubtitle" >Spender is willing to pay:</p>
-      <p id="earnerSpenderPayment" className="stageSubtitle"></p>
+      <p className="stageSubtitle">{props.payment}</p>
     
-      <p className="stageInfo">You can accept or decline the offer.</p>
+      <p className="stageInfo">plaese accept or decline the offer.</p>
     
     
       <button className="stageActionButton" onClick={props.handleInvitation} data-ref="accept" >Accept & Start</button>
@@ -109,10 +106,6 @@ const Communication = props => {
   
   const spender = () => (
     <div id="spenderChat"  className="chat">
-        <div className="chatTitleContainer">
-          <p className="chatTitle">Welcome Spender</p>
-        </div>
-  
         <div id="sStage1" className="chatStage isActive">
           <div className="stageContent">
           <img className="stageProgress" src={progress_svg}/>
@@ -121,7 +114,7 @@ const Communication = props => {
             <p className="stageSubtitle" >Please send short message.<br/><br/>
             Earner will get:<br/>
             - The massage<br/>
-            - Your willing to pay value: {props.payment}</p>
+            - Your willing to pay value: {payment}</p>
             <p className="stageInfo">Earner can accept or decline your offer.</p>
             <input id="spenderMessage" type="text" className="comTextInput" onChange={props.handleInput} data-ref="message" placeholder="Enter short message"/>				
             <button className="stageActionButton" onClick={props.send}>Send Payment and Message</button>
@@ -208,26 +201,6 @@ const Communication = props => {
           </button>
         </div>
         {props.minutes > 0 && <div className="timer"><Timer minutes={props.minutes} ></Timer></div>}
-        <div className="request-access">
-          <p><span className="you-left">You hung up.&nbsp;</span>Send a request to the Broadcaster. {props.sid}</p>
-          <form onSubmit={props.send}>
-            <input type="text" autoFocus onChange={props.handleInput} data-ref="message"  maxLength="30" required placeholder="Hi, I'm John Doe." />
-            <button className="primary-button">Send</button>
-          </form>
-        </div>
-        <div className="grant-access">
-          <p>User Approved Payment of {props.payment} PPC tokens</p>
-          <div>Message: {props.message}</div>
-          <button onClick={props.handleInvitation} data-ref="reject" className="primary-button">Reject</button>
-          <button onClick={props.handleInvitation} data-ref="accept" className="primary-button">Accept</button>
-        </div>
-        <div className="room-occupied">
-          <p>Please, try another room!</p>
-          <Link  className="primary-button" to="/">OK</Link>
-        </div>
-        <div className="waiting">
-          <p><span>Meeting Link:&nbsp;</span><a href={link}>{link}</a> </p>
-        </div>
       </div>
 
   )
@@ -249,3 +222,25 @@ Communication.propTypes = {
 
 export default Communication;
 
+/*
+<div className="request-access">
+          <p><span className="you-left">You hung up.&nbsp;</span>Send a request to the Broadcaster. {props.sid}</p>
+          <form onSubmit={props.send}>
+            <input type="text" autoFocus onChange={props.handleInput} data-ref="message"  maxLength="30" required placeholder="Hi, I'm John Doe." />
+            <button className="primary-button">Send</button>
+          </form>
+        </div>
+        <div className="grant-access">
+          <p>User Approved Payment of {props.payment} PPC tokens</p>
+          <div>Message: {props.message}</div>
+          <button onClick={props.handleInvitation} data-ref="reject" className="primary-button">Reject</button>
+          <button onClick={props.handleInvitation} data-ref="accept" className="primary-button">Accept</button>
+        </div>
+        <div className="room-occupied">
+          <p>Please, try another room!</p>
+          <Link  className="primary-button" to="/">OK</Link>
+        </div>
+        <div className="waiting">
+          <p><span>Meeting Link:&nbsp;</span><a href={link}>{link}</a> </p>
+        </div>
+        */
