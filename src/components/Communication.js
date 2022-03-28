@@ -5,7 +5,6 @@ import ToggleFullScreen from './ToggleFullScreen';
 import store from '../store'
 
 import done_svg from '../../img/done.svg';
-//import alone_svg from '../../img/alone.svg';
 import progress_svg from '../../img/C32CtmLogoProgressIndicator.svg';
 import { toast } from 'react-toastify';
 
@@ -50,7 +49,7 @@ const Communication = props => {
         <img className="stageProgress" src={progress_svg}/>
         <img className="stageDoneImg" src={done_svg}/>
         <p className="stageTitle">Share meeting link</p>
-        <p className="stageSubtitle">publishing the meeting link. let spenders reach you.</p>
+        <p className="stageInfo">Publishing the meeting link. let spenders reach you.</p>
         <p id="meetingLink" className="stageSubtitle">{link}</p>
         <button className="stageActionButton" onClick={copyLink}>Copy meeting link</button>
       </div>
@@ -68,17 +67,12 @@ const Communication = props => {
     <div className="stageContent">
     <img className="stageProgress" src={progress_svg}/>
         <img className="stageDoneImg" src={done_svg}/>
-      <p className="stageTitle">Accept payment and Start meeting</p>
-    
-      <p className="stageSubtitle" >Spender say:</p>
-      <p className="stageSubtitle">{props.message}</p>
-    
-      <p className="stageSubtitle" >Spender is willing to pay:</p>
-      <p className="stageSubtitle">{props.payment}</p>
-    
-      <p className="stageInfo">plaese accept or decline the offer.</p>
-    
-    
+      <p className="stageTitle">Accept payment and Start meeting</p> 
+      <p className="stageInfo" >Spender say:</p>
+      <p className="stageSubtitle">{props.message}</p>   
+      <p className="stageInfo" >Spender is willing to pay:</p>
+      <p className="stageSubtitle">{props.payment} CTMs.</p>  
+      <p className="stageInfo">plaese accept or decline the offer.</p>  
       <button className="stageActionButton" onClick={props.handleInvitation} data-ref="accept" >Accept & Start</button>
       <button className="stageActionButton" onClick={props.handleInvitation} data-ref="reject" >Decline</button>
       <p className="stageDoneTitle">Payment Accepted</p>
@@ -89,7 +83,7 @@ const Communication = props => {
     <img className="stageProgress" src={progress_svg}/>
         <img className="stageDoneImg" src={done_svg}/>
       <p className="stageTitle">Meta Mask Confermation</p>
-      <p className="stageSubtitle">plaese confirm the transaction on Meta Mask</p>
+      <p className="stageSubtitle">Plaese confirm the transaction on Meta Mask</p>
       <p className="stageDoneTitle">CTMs transaction confirmed</p>
     </div>
     </div>
@@ -110,13 +104,10 @@ const Communication = props => {
           <div className="stageContent">
           <img className="stageProgress" src={progress_svg}/>
         <img className="stageDoneImg" src={done_svg}/>
-            <p className="stageTitle">Massage Payment</p>
-            <p className="stageSubtitle" >Please send short message.<br/><br/>
-            Earner will get:<br/>
-            - The massage<br/>
-            - Your willing to pay value: {payment}</p>
-            <p className="stageInfo">Earner can accept or decline your offer.</p>
-            <input id="spenderMessage" type="text" className="comTextInput" onChange={props.handleInput} data-ref="message" placeholder="Enter short message"/>				
+            <p className="stageTitle">Massage and Payment</p>
+            <input id="spenderMessage" type="text" className="comTextInput" onChange={props.handleInput} data-ref="message" placeholder="Please enter short message."/>				
+            <p className="stageInfo">You are willing to pay {payment} CTMs.<br>
+            </br>Earner can accept or decline your offer.</p>
             <button className="stageActionButton" onClick={props.send}>Send Payment and Message</button>
             <p className="stageDoneTitle">Massage Payment</p>          
           </div>
@@ -126,7 +117,7 @@ const Communication = props => {
           <img className="stageProgress" src={progress_svg}/>
         <img className="stageDoneImg" src={done_svg}/>
             <p className="stageTitle">Meta Mask Confermation</p>
-            <p className="stageSubtitle">plaese confirm the transaction on Meta Mask</p>
+            <p className="stageSubtitle">Plaese confirm the transaction on Meta Mask</p>
             <p className="stageDoneTitle">CTMs transaction confirmed</p>
           </div>
         </div> 

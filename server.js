@@ -22,6 +22,7 @@ server = process.env.NODE_ENV === 'production' ?
 
 const io = new Server(server, {'transports': ['websocket']  });
 
+
 const pubClient = createClient({ url: "redis://localhost:6379" });
 const subClient = pubClient.duplicate();
 //io.adapter(createAdapter(pubClient, subClient));
