@@ -69,6 +69,16 @@ const Home = (props) => {
   useEffect(() => {
     const init = async () => {
       let { ppcToken } = await getBlockchain(toast).catch((x) => ({ppcToken : 0}));
+      let isgum = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: true
+      })
+
+      if(!isgum) {
+        toast.error(`Cannot Get video/audio streams`)
+        await new Promise(resolve => setTimeout(resolve, 4000));
+        location.href = 'https://cryptomeet.me/'
+      }
 
       if(!ppcToken){
         toast.error(`No wallet Detected`)
