@@ -68,10 +68,7 @@ const Communication = props => {
     <img className="stageProgress" src={progress_svg}/>
         <img className="stageDoneImg" src={done_svg}/>
       <p className="stageTitle">Accept payment and Start meeting</p> 
-      <p className="stageInfo" >Spender say:</p>
-      <p className="stageSubtitle">{props.message}</p>   
-      <p className="stageInfo" >Spender is willing to pay:</p>
-      <p className="stageSubtitle">{props.payment} CTMs.</p>  
+      <p className="stageSubtitle" >Spender say: {props.message} <br></br>Spender is willing to pay: {props.payment} CTMs.</p>
       <p className="stageInfo">plaese accept or decline the offer.</p>  
       <button className="stageActionButton" onClick={props.handleInvitation} data-ref="accept" >Accept & Start</button>
       <button className="stageActionButton" onClick={props.handleInvitation} data-ref="reject" >Decline</button>
@@ -82,7 +79,7 @@ const Communication = props => {
     <div className="stageContent">
     <img className="stageProgress" src={progress_svg}/>
         <img className="stageDoneImg" src={done_svg}/>
-      <p className="stageTitle">Meta Mask Confermation</p>
+      <p className="stageTitle">Meta Mask Confirmation</p>
       <p className="stageSubtitle">Plaese confirm the transaction on Meta Mask</p>
       <p className="stageDoneTitle">CTMs transaction confirmed</p>
     </div>
@@ -90,8 +87,8 @@ const Communication = props => {
     <div id="eStage4" className="chatStage">
     <div className="stageContent">
     <img className="stageProgress" src={progress_svg}/>
-        <img className="stageDoneImg" src={done_svg}/>
-      <p className="stageTitle">Transfering CTMs to Earner</p>
+        <img className="stageDoneImg" src={done_svg}/>  
+      <p className="stageTitle">Transfering CTMs to you</p>
       <p className="stageDoneTitle">Payment complited - Strating the meeting...</p>
     </div> 
     </div>
@@ -116,7 +113,7 @@ const Communication = props => {
           <div className="stageContent">
           <img className="stageProgress" src={progress_svg}/>
         <img className="stageDoneImg" src={done_svg}/>
-            <p className="stageTitle">Meta Mask Confermation</p>
+            <p className="stageTitle">Meta Mask Confirmation</p>
             <p className="stageSubtitle">Plaese confirm the transaction on Meta Mask</p>
             <p className="stageDoneTitle">CTMs transaction confirmed</p>
           </div>
@@ -140,9 +137,8 @@ const Communication = props => {
         <div id="sStage3" className="chatStage">
           <div className="stageContent">
           <img className="stageProgress" src={progress_svg}/>
-        <img className="stageDoneImg" src={done_svg}/>
-            <p className="stageTitle">Wating for Earner to accept the payment.</p>
-            <p className="stageSubtitle">Earner can decline and...</p>
+          <img className="stageDoneImg" src={done_svg}/>
+            <p className="stageTitle">Wating for Earner confirmation.</p>
             <p className="stageDoneTitle">Earner confirm the payment</p>
           </div> 
         </div>           
