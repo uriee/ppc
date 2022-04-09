@@ -1,5 +1,5 @@
 import { ethers, Contract } from 'ethers';
-import PPIToken from './contract/PPIToken.json';
+import PPIToken from './contract/CryptoMeetMeDemo.json';
 
 const networks = {
     polygon: {
@@ -82,7 +82,7 @@ const getBlockchain = () => new Promise((resolve, reject) => {
             const signerAddress = await signer.getAddress();
 
             const ppcToken = new Contract(
-                "0xcc3c3a48780F2891ED278341d8359f96Fa4f3036",
+                "0x69ce221ac9b1cd69c1daf16476516f453c30380f",
                 PPIToken.output.abi,
                 signer
             );

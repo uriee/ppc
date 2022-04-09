@@ -29,7 +29,8 @@ function appNavToWelcome() {
   document.getElementById('app-create-page').style.display = 'none';
   document.getElementById('app-welcome-page').style.display = 'block';
 } 
-
+let signer = null
+let CMDToken = null
 const Home = (props) => {
   const globalState = store.getState();
 
@@ -66,10 +67,25 @@ const Home = (props) => {
     store.dispatch({ type: 'SET_CHATID', chatID:  e.target.value})
   }
 
+  const faucet = async () => {
+    toast.info("Waiting for the BSC TestNet wallet.")
+    const ret = await CMDToken.transferFromDemo(signer)
+    toast.promise(
+      ret.wait(),
+      {
+        pending: 'Getting 50 CDM from Faucet',
+        success: 'Tokens in bound 👌',
+        error: 'Error 🤯',
+        autoClose: 2000, pauseOnHover: false
+      }
+    )
+  }
+
   useEffect(() => {
     const init = async () => {
-      let { ppcToken } = await getBlockchain(toast).catch((x) => ({ppcToken : 0}));
-
+      let { signerAddress, ppcToken } = await getBlockchain(toast).catch((x) => ({ppcToken : 0}));
+      CMDToken = ppcToken  
+      signer = signerAddress
       if(!ppcToken){
         toast.error(`No wallet Detected`)
         await new Promise(resolve => setTimeout(resolve, 4000));
@@ -77,7 +93,6 @@ const Home = (props) => {
       }else{
         toast("Wallet Connected :)")
       }
-
     };
     init(); 
     if (props.byLink) appNavToJoin();
@@ -95,7 +110,7 @@ const Home = (props) => {
                         <img id="app-welcome-logo" src={logo} alt=""/>
                         <p id="app-welcome-title" className="is-app-front-text">Crypro Meet Me</p>
                         <p id="app-welcome-subtitle" className="is-app-front-text">private. direct pay. video chat.</p>
-
+                        <button className="app-welcome-button is-app-front-text" onClick={faucet}>squeeze the CMD faucet</button>
                         <button className="app-welcome-button is-app-front-text" onClick={appNavToCreate}>Create a Meeting</button>
                         <div id="join-text-line">
                         <p id="app-welcome-or-text" className="is-app-front-text">or click <span id="app-join-a-meeting" onClick={appNavToJoin}>join a meeting</span> by meeting ID or meeting Name.</p>
