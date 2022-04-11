@@ -19,7 +19,7 @@
     --ctm-app-chat-background: #0f0330cb;
     --ctm-app-link: #3e8cf1;
 
-    --ctm-app-front-color: #eda514;
+    --ctm-app-front-color: #eda514e6;
     --ctm-app-shadow-color: #eedc8a2f;
     --ctm-stage-button-shine-border:#fcba38;
 
@@ -658,20 +658,25 @@ input {
   .chatStage {
     display: block;
     opacity: 0;
+    height: 0px;
     width: 70%;
-    border: 2px solid var(--ctm-app-front-color);
+    border: 1px solid var(--ctm-app-front-color);
     border-radius: 26px;
     background-color: var(--ctm-app-chat-background);
-    padding: 0%;
+    padding: 2%;
     min-height: 5%;
     align-self: center;
     align-content: center;
     margin: 1%;
-    transition: width 0.5s ease-out;
-    -webkit-box-shadow: 1px 1px 5px 0 var(--ctm-app-chat-background);
+    transition: all 0.5s ease-out;
+    /* -webkit-box-shadow: 1px 1px 5px 0 var(--ctm-app-chat-background);
     -moz-box-shadow: 1px 1px 5px 0 var(--ctm-app-chat-background);
-    box-shadow: .4ex .4ex 3em var(--ctm-app-chat-background);
-
+    box-shadow: .4ex .4ex 3em var(--ctm-app-chat-background); */
+    border-radius: 26px;
+    border: solid 2px var(--ctm-app-shadow-color);
+    -webkit-box-shadow: 1px 1px 5px 0 var(--ctm-app-shadow-color);
+    -moz-box-shadow: 1px 1px 5px 0 var(--ctm-app-shadow-color);
+    box-shadow: .4ex .4ex 3em var(--ctm-app-shadow-color);
   }
   
   .stageContent {
@@ -794,8 +799,8 @@ input {
   
   .chatStage.isActive {
     width: 98%;
+    height: auto;    /* min-height: 20vh; */
     opacity: 1;
-    /* min-height: 20vh; */
   }
   
   .chatStage.isActive .stageContent{
