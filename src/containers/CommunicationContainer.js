@@ -43,8 +43,8 @@ class CommunicationContainer extends React.Component {
 spenderMMConfirm_e(){
    var e1 = document.getElementById("eStage1");
    var e2 = document.getElementById("eStage2");
-  //  e1.classList.remove("isActive")
-  //  e1.classList.add("isCompact");
+    e1.classList.remove("isActive")
+    e1.classList.add("isDone");
    e2.classList.add("isActive");
 }
 
