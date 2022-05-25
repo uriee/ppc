@@ -89,7 +89,6 @@ earnerMMConfirm_e() {
 initCom(){
   const { owner } = store.getState();
   let chat = document.getElementsByClassName('chat')[0]
-  console.log("Fuck",chat);
   chat && (chat.style.display = 'flex')
   if (owner) { 
     var e1 = document.getElementById("eStage1");
@@ -200,6 +199,7 @@ initCom(){
       console.log("disconnect:",props);
       this.props.media.setState({bridge: 'full'});
       toast.error(`Diconnected`)
+      this.initCom()
       await new Promise(resolve => setTimeout(resolve, 3000));
       window.history.back()
       
@@ -303,30 +303,36 @@ initCom(){
     console.log("SEND",addr_b, this.props.payment + '000000000',this.ppcToken) 
     //Set Allowance
     toast.info("Waiting for your BSC wallet.")
-    const ret = await this.ppcToken.approve(addr_b, this.props.payment + '000000000')
-    this.props.socket.emit('transfer',this.state);
-    toast.promise(
-      ret.wait(),
-      {
-        pending: 'Sending token to PPC',
-        success: 'Tokens sent 👌',
-        error: 'Error 🤯',
-        autoClose: 2000, pauseOnHover: false
-      }
-    )
-    this.spenderMMConfirm_s()
-    const confirmation = await ret.wait()
 
-    console.log("SEND 3",confirmation)
-    if (confirmation.status === 1) {
-      this.props.socket.emit('auth', this.state);
-      //this.hideAuth();
-      this.moneyOnTheTable_s()
-    }
-    else{
-      this.setState({update: this.state.update +1})
+    try {
+      const ret = await this.ppcToken.approve(addr_b, this.props.payment + '000000000')
+
+      this.props.socket.emit('transfer',this.state);
+      toast.promise(
+        ret.wait(),
+        {
+          pending: 'Sending token to PPC',
+          success: 'Tokens sent 👌',
+          error: 'Error 🤯',
+          autoClose: 2000, pauseOnHover: false
+        }
+      )
+      this.spenderMMConfirm_s()
+      const confirmation = await ret.wait()
+
+      console.log("SEND 3",confirmation)
+      if (confirmation.status === 1) {
+        this.props.socket.emit('auth', this.state);
+        //this.hideAuth();
+        this.moneyOnTheTable_s()
+      }
+      else{
+        this.setState({update: this.state.update +1})
+        this.initCom()
+      }
+    }catch(e){
       this.initCom()
-    }
+    }      
   }
 
   Accept = async () => {

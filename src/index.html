@@ -10,8 +10,20 @@
     	color: #eee;
 	  }
   </style>
+  <script>
+      window.addEventListener('beforeunload', (event) => {
+        event.stopPropagation()
+        event.returnValue = `Are you sure you want to leave?`;
+      });
+  </script>
 </head>
 <body itemscope="itemscope" itemtype="http://schema.org/WebPage">
   <main id="app" role="main" itemprop="mainContentOfPage" itemscope="itemscope" itemtype="https://schema.org/SoftwareApplication"></main>
+  <script>
+    window.addEventListener('beforeunload', (event) => {
+      event.stopPropagation()
+      event.returnValue = `Are you sure you want to leave?`;
+    });
+</script>
 </body>
 </html>

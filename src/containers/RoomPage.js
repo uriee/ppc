@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import MediaContainer from './MediaContainer'
 import CommunicationContainer from './CommunicationContainer'
+import { Prompt } from 'react-router'
 import { connect } from 'react-redux'
 import store from '../store'
 import io from 'socket.io-client'
@@ -16,15 +17,26 @@ class RoomPage extends Component {
     //this.socket = io.connect('https//localhost:3002');
     this.socket = io( {
     // WARNING: in that case, there is no fallback to long-polling
-    transports: [ "websocket" ] // or [ "websocket", "polling" ] (the order matters)
+    transports: [ "websocket" ], // or [ "websocket", "polling" ] (the order matters)
+    closeOnBeforeunload: false
     });
   }
+
   componentDidMount() {
+    window.addEventListener('beforeunload', (event) => {
+      event.stopPropagation()
+      event.returnValue = `Are you sure you want to leave?`;
+    });
     this.props.addRoom();
   }
+
   render(){
     return (
       <div>
+        <Prompt
+          when={true}
+          message='Are you sure you want to leave? The Meeting will terminate'
+        />        
         <MediaContainer media={media => this.media = media} socket={this.socket} getUserMedia={this.getUserMedia} />
         <CommunicationContainer socket={this.socket} media={this.media} getUserMedia={this.getUserMedia} />
       </div>
