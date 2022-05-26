@@ -114,6 +114,7 @@ class MediaBridge extends Component {
   }
 
   async hangup() {
+    confirm('Are you sure you want to leave? The Meeting will terminate')    
     const owner = store.getState().owner;
     console.log("OWNER hangup",owner)
     if(owner) {

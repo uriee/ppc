@@ -225,6 +225,7 @@ initCom(){
       toast(`SomeOne is considering a session for ${addr_v.payment} PPC.`, { autoClose: 2000, pauseOnHover: false })
       if (parseInt(state.fee) > parseInt(addr_v.payment)) {
         this.props.socket.emit('reject', sid, "You need to pay more.")
+        this.initCom()
         this.setState({ addr_v: null});
         return;
       }
@@ -327,8 +328,8 @@ initCom(){
         this.moneyOnTheTable_s()
       }
       else{
-        this.setState({update: this.state.update +1})
         this.initCom()
+        this.setState({update: this.state.update +1})
       }
     }catch(e){
       this.initCom()
@@ -339,31 +340,38 @@ initCom(){
     console.log("Accept",this.state.addr_v, this.signerAddress, this.state.payment + '000000000',store.fee,store.getState().fee)
     if (this.state.payment < store.fee) {
       this.props.socket.emit('reject', this.state.sid, "You need to pay more.");
+      this.initCom()
       this.setState({ addr_v: null});
       return;
     }
-    const ret = await this.ppcToken.transferFrom(this.state.addr_v, this.signerAddress,  this.state.payment + '000000000')
-    this.props.socket.emit('claim',this.state.sid);
-    toast.promise(
-      ret.wait(),
-      {
-        pending: 'Getting the preciouse tokens',
-        success: 'Tokens recieved 👌',
-        error: 'Error 🤯',
-        autoClose: 2000, pauseOnHover: false 
+    try {
+      const ret = await this.ppcToken.transferFrom(this.state.addr_v, this.signerAddress,  this.state.payment + '000000000')
+      this.props.socket.emit('claim',this.state.sid);
+      toast.promise(
+        ret.wait(),
+        {
+          pending: 'Getting the preciouse tokens',
+          success: 'Tokens recieved 👌',
+          error: 'Error 🤯',
+          autoClose: 2000, pauseOnHover: false 
+        }
+      )
+      this.earnerMMConfirm_e()
+      const accept =  await ret.wait()
+      console.log("ACCEPT:",accept)
+      if (accept.status == 1) {
+        this.props.socket.emit('accept', this.state.sid);
+        this.setState({ minutes: store.getState().interval });
+      }else{
+        this.props.socket.emit('reject', this.state.sid, "You've been rejected by the Broadcaster.");
+        this.initCom()
+        this.setState({ addr_v: null});
       }
-    )
-    this.earnerMMConfirm_e()
-    const accept =  await ret.wait()
-    console.log("ACCEPT:",accept)
-    if (accept.status == 1) {
-      this.props.socket.emit('accept', this.state.sid);
-      this.setState({ minutes: store.getState().interval });
-    }else{
+    }catch(e){
       this.props.socket.emit('reject', this.state.sid, "You've been rejected by the Broadcaster.");
-      //this.hideAuth();
+      this.initCom()
       this.setState({ addr_v: null});
-    }
+    }         
   }
 
   getTheMoney(e)  {
@@ -377,8 +385,8 @@ initCom(){
 
   ernerDecline() {
     this.props.socket.emit('reject', this.state.sid, "You've been rejected by the Broadcaster.");
-    this.setState({ addr_v: null});    
-    this.initCom()  
+    this.initCom()
+    this.setState({ addr_v: null});      
   }
 
   handleInvitation(e) {
@@ -393,8 +401,8 @@ initCom(){
       emm.classList.add("isActive");      
     }else{
       this.props.socket.emit('reject', this.state.sid, "You've been rejected by the Broadcaster.");
-      this.setState({ addr_v: null});
       this.initCom()
+      this.setState({ addr_v: null});
     }
     ///this.hideAuth();  
   }
@@ -414,10 +422,12 @@ initCom(){
   }
 
   handleHangup() {
-    console.log("Hang up",this.props)
-    this.initCom()
-    this.props.media.hangup();
-    this.setState({ minutes: 0 });
+    if (confirm('Are you sure you want to leave? The Meeting will terminate')) {
+      console.log("Hang up",this.props)
+      this.initCom()
+      this.props.media.hangup();
+      this.setState({ minutes: 0 });
+    }
   }
   render(){
     return (
