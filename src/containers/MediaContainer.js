@@ -48,6 +48,7 @@ class MediaBridge extends Component {
     this.props.media(null);
     if (this.localStream !== undefined) {
       this.localStream.getVideoTracks()[0].stop();
+      this.localStream.getAudioTracks().map(x => x.stop())
     }
     this.props.socket.emit('leave');
   }
@@ -55,6 +56,8 @@ class MediaBridge extends Component {
     const owner = store.getState().owner;
     console.log("OWNER onRemoteHangup",owner)
     this.setState({bridge: 'host-hangup',  minutes: 0});
+    this.remoteStream.getVideoTracks()[0].stop();
+      this.remoteStream.getAudioTracks().map(x => x.stop())    
     if(!owner){
       toast.error(message)
       await new Promise(resolve => setTimeout(resolve, 3000));  
@@ -117,6 +120,8 @@ class MediaBridge extends Component {
     confirm('Are you sure you want to leave? The Meeting will terminate')    
     const owner = store.getState().owner;
     console.log("OWNER hangup",owner)
+    this.remoteStream.getVideoTracks()[0].stop();
+    this.remoteStream.getAudioTracks().map(x => x.stop())     
     if(owner) {
       this.setState({bridge: 'host-hangup'})
     } else {
