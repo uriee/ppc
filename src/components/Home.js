@@ -83,30 +83,33 @@ const Home = (props) => {
 
   useEffect(() => {
     const init = async () => {
-      let { signerAddress, ppcToken } = await getBlockchain(toast).catch((x) => ({ppcToken : 0}));
-      CMDToken = ppcToken  
+      // Mock blockchain initialization
+      let { signerAddress, ppcToken } = await getBlockchain(toast).catch((x) => ({
+        signerAddress: '0xMOCKADDRESS',
+        ppcToken: {}
+      }));
+      CMDToken = ppcToken
       signer = signerAddress
 
-      let isgum = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-        video: true
-      })
+      try {
+        let isgum = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+          video: true
+        })
 
-      if(!isgum) {
-        toast.error(`Cannot Get video/audio streams`)
-        await new Promise(resolve => setTimeout(resolve, 4000));
-        location.href = 'https://cryptomeet.me/'
+        if(!isgum) {
+          toast.error(`Cannot Get video/audio streams`)
+          return;
+        }
+      } catch (e) {
+        toast.error(`Cannot Get video/audio streams: ${e.message}`)
+        return;
       }
 
-      if(!ppcToken){
-        toast.error(`No wallet Detected`)
-        await new Promise(resolve => setTimeout(resolve, 4000));
-        location.href = 'https://cryptomeet.me/'
-      }else{
-        toast("Wallet Connected :)")
-      }
+      // Mock wallet is always "connected"
+      toast("Mock Wallet Connected :)")
     };
-    init(); 
+    init();
     if (props.byLink) appNavToJoin();
   }, []);
 

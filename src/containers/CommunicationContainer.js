@@ -142,8 +142,11 @@ initCom(){
    }    
 
   full() {
-    console.log("FULL", this.props.media)
-    this.props.media.setState({bridge: 'full'});
+    const media = this.props.getMedia();
+    console.log("FULL", media)
+    if (media) {
+      media.setState({bridge: 'full'});
+    }
     toast("Broadcaster is accupied", { autoClose: 2000, pauseOnHover: false })
   }
 
@@ -159,26 +162,53 @@ initCom(){
     }
 
     socket.on('create', (props) => {
-      console.log("create",props.id)
-      this.props.media.setState({user: 'host', bridge: 'create'})
+      console.log("create event received",props.id)
+      const media = this.props.getMedia();
+      console.log("media exists?", !!media)
+      // Wait for media to be available
+      const setMediaState = () => {
+        const media = this.props.getMedia();
+        if (!media) {
+          setTimeout(setMediaState, 10);
+          return;
+        }
+        console.log("Setting media state: user='host', bridge='create'")
+        media.setState({user: 'host', bridge: 'create'})
+      };
+      setMediaState();
       store.dispatch({ type: 'SET_OWNER', owner: true})
       this.setState({id: props.id});
     });
 
     socket.on('full', async ()=> {
-      console.log("FULL", this.props.media)
-      this.props.media.setState({bridge: 'full'});
+      const media = this.props.getMedia();
+      console.log("FULL", media)
+      if (media) {
+        media.setState({bridge: 'full'});
+      }
       toast("Broadcaster is accupied")
       await new Promise(resolve => setTimeout(resolve, 3000));
       window.history.back()
     });
 
     socket.on('bridge', props => {
-      console.log("bridge",props)
+      console.log("bridge event received",props)
+      const media = this.props.getMedia();
+      console.log("media exists?", !!media)
       props.interval && this.setState({ minutes: props.interval });
       const chat = document.getElementsByClassName('chat')[0]
       chat.style.display = 'none'
-      this.props.media.init() 
+      // Wait for media to be available
+      const callInit = () => {
+        const media = this.props.getMedia();
+        if (!media) {
+          setTimeout(callInit, 10);
+          return;
+        }
+        console.log('Calling media.init()...')
+        media.init()
+      };
+      callInit();
     });
 
     socket.on('hangup', async (message) => {
@@ -189,20 +219,35 @@ initCom(){
     });    
 
     socket.on('join', (props) => {
-      console.log("FEE INTERVAL:",props);
-      this.props.media.setState({user: 'guest', bridge: 'join'})
+      console.log("join event received, FEE INTERVAL:",props);
+      const media = this.props.getMedia();
+      console.log("media exists?", !!media)
+      // Wait for media to be available
+      const setMediaState = () => {
+        const media = this.props.getMedia();
+        if (!media) {
+          setTimeout(setMediaState, 10);
+          return;
+        }
+        console.log("Setting media state: user='guest', bridge='join'")
+        media.setState({user: 'guest', bridge: 'join'})
+      };
+      setMediaState();
       store.dispatch({ type: 'SET_OWNER', owner: false})
       this.setState({id :props.sid})
     });
 
     socket.on('disconnect', async (props) => {
       console.log("disconnect:",props);
-      this.props.media.setState({bridge: 'full'});
+      const media = this.props.getMedia();
+      if (media) {
+        media.setState({bridge: 'full'});
+      }
       toast.error(`Diconnected`)
       this.initCom()
       await new Promise(resolve => setTimeout(resolve, 3000));
       window.history.back()
-      
+
     });
 
     socket.on('claim', () => {
@@ -213,7 +258,10 @@ initCom(){
 
     socket.on('approve', ({ message, sid }) => {
       console.log("approve",message,sid)
-      this.props.media.setState({bridge: 'approve'});
+      const media = this.props.getMedia();
+      if (media) {
+        media.setState({bridge: 'approve'});
+      }
       this.moneyOnTheTable_e()
       this.setState({ message, sid });
     });
@@ -221,7 +269,7 @@ initCom(){
     socket.on('addr_v', ({ addr_v, sid}) => {
       const state = store.getState();
       console.log("addr_v",addr_v,sid, socket.id);
-      this.setState({ addr_v: addr_v.addr_v, payment: addr_v.payment });
+      this.setState({ addr_v: addr_v.addr_v, payment: addr_v.payment, sid: sid });
       toast(`SomeOne is considering a session for ${addr_v.payment} PPC.`, { autoClose: 2000, pauseOnHover: false })
       if (parseInt(state.fee) > parseInt(addr_v.payment)) {
         this.props.socket.emit('reject', sid, "You need to pay more.")
@@ -262,17 +310,18 @@ initCom(){
           this.localStream.getAudioTracks()[0].enabled = this.state.audio;
         });
 
-    const init = async () => {
-      let { signerAddress, ppcToken } = await getBlockchain(toast);
+    const initWallet = async () => {
+      // Mock blockchain initialization
+      let { signerAddress, ppcToken } = await getBlockchain(toast).catch(() => ({
+        signerAddress: '0xMOCKADDRESS',
+        ppcToken: {}
+      }));
       this.signerAddress = signerAddress
-      if(!ppcToken){
-        toast.error(`No wallet Detected`)
-        await new Promise(resolve => setTimeout(resolve, 4000));
-        location.href = 'https://cryptomeet.me/'
-      }
       this.ppcToken = ppcToken
+      // Mock wallet is always "connected" - no redirect
+      console.log('Mock wallet connected:', signerAddress);
     };
-    !this.ppcToken && init();        
+    !this.ppcToken && initWallet();
   }
 
   handleInput(e) {
@@ -425,18 +474,22 @@ initCom(){
     if (confirm('Are you sure you want to leave? The Meeting will terminate')) {
       console.log("Hang up",this.props)
       this.initCom()
-      this.props.media.hangup();
+      const media = this.props.getMedia();
+      if (media) {
+        media.hangup();
+      }
       this.setState({ minutes: 0 });
     }
   }
   render(){
+    const media = this.props.getMedia();
     return (
       <Communication
         {...this.state}
         toggleVideo={this.toggleVideo}
         toggleAudio={this.toggleAudio}
         send={this.send}
-        shareScreen ={this.props.media ? this.props.media.shareScreen : (x)=>x}
+        shareScreen ={media ? media.shareScreen : (x)=>x}
         sid={this.state ? this.state.id : ''}
         minutes={this.state.minutes}
         handleHangup={this.handleHangup}
@@ -461,6 +514,6 @@ CommunicationContainer.propTypes = {
   video: PropTypes.bool.isRequired,
   setVideo: PropTypes.func.isRequired,
   setAudio: PropTypes.func.isRequired,
-  media: PropTypes.instanceOf(MediaContainer)
+  getMedia: PropTypes.func.isRequired
 };
 export default connect(mapStateToProps, mapDispatchToProps)(CommunicationContainer);

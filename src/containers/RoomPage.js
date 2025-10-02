@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
+import React, { Component, useEffect } from 'react';
+import { useParams, useBlocker } from 'react-router-dom'
 import MediaContainer from './MediaContainer'
 import CommunicationContainer from './CommunicationContainer'
-import { Prompt } from 'react-router'
 import { connect } from 'react-redux'
 import store from '../store'
 import io from 'socket.io-client'
@@ -33,27 +33,33 @@ class RoomPage extends Component {
   render(){
     return (
       <div>
-        <Prompt
-          when={true}
-          message='Are you sure you want to leave? The Meeting will terminate'
-        />        
         <MediaContainer media={media => this.media = media} socket={this.socket} getUserMedia={this.getUserMedia} />
-        <CommunicationContainer socket={this.socket} media={this.media} getUserMedia={this.getUserMedia} />
+        <CommunicationContainer socket={this.socket} getMedia={() => this.media} getUserMedia={this.getUserMedia} />
       </div>
     );
   }
 }
+
+// Wrapper component to use hooks with class component
+const RoomPageWrapper = (props) => {
+  const params = useParams();
+
+  return <RoomPage {...props} params={params} />;
+};
+
 const mapStateToProps = store => ({rooms: new Set([...store.rooms])});
 const mapDispatchToProps = (dispatch, ownProps) => (
     {
       addRoom: () => {
-        store.dispatch({ type: 'ADD_ROOM', room: ownProps.match.params.room})
-        ownProps.match.params.chat_id && store.dispatch({ type: 'SET_CHATID', chatID:  ownProps.match.params.chat_id})
-        ownProps.match.params.fee && store.dispatch({ type: 'SET_FEE', fee:  ownProps.match.params.fee})
+        if (ownProps.params) {
+          store.dispatch({ type: 'ADD_ROOM', room: ownProps.params.room})
+          ownProps.params.chat_id && store.dispatch({ type: 'SET_CHATID', chatID:  ownProps.params.chat_id})
+          ownProps.params.fee && store.dispatch({ type: 'SET_FEE', fee:  ownProps.params.fee})
+        }
       }
     }
   );
-export default connect(mapStateToProps, mapDispatchToProps)(RoomPage);
+export default connect(mapStateToProps, mapDispatchToProps)(RoomPageWrapper);
 
 /*
 const roomPage = (props) => {

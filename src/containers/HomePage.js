@@ -1,11 +1,12 @@
 import React, { useState } from 'react'
+import { useParams } from 'react-router-dom'
 import Home from '../components/Home';
 import store from '../store'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const HomePage = props => {
-  const params = props.match.params;
+const HomePage = () => {
+  const params = useParams();
   let byLink = 0;
 
   if (params.room) {

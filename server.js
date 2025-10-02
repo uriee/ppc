@@ -11,26 +11,39 @@ const { createAdapter } = require("@socket.io/redis-adapter")
 const { createClient } = require("redis")
 
 const app = express(),
-  options = { 
+  options = {
     key: fs.readFileSync(__dirname + '/rtc-video-room-key.pem'),
     cert: fs.readFileSync(__dirname + '/rtc-video-room-cert.pem')
   },
 port = 3002,
 server = process.env.NODE_ENV === 'production' ?
-  http.createServer(app).listen(port) :
-  https.createServer(options, app).listen(port)
+  http.createServer(app).listen(port, () => {
+    console.log(`Server running on http://localhost:${port}`);
+  }) :
+  https.createServer(options, app).listen(port, () => {
+    console.log(`Server running on https://localhost:${port}`);
+  })
 
 const io = new Server(server, {'transports': ['websocket']  });
 
-
+console.log('Connecting to Redis...');
 const pubClient = createClient({ url: "redis://localhost:6379" });
 const subClient = pubClient.duplicate();
-//io.adapter(createAdapter(pubClient, subClient));
 
-Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
-  io.adapter(createAdapter(pubClient, subClient));
-  //io.listen(3000);
-});
+// Handle Redis connection errors
+pubClient.on('error', (err) => console.error('Redis Pub Client Error:', err));
+subClient.on('error', (err) => console.error('Redis Sub Client Error:', err));
+
+Promise.all([pubClient.connect(), subClient.connect()])
+  .then(() => {
+    console.log('Redis connected successfully!');
+    io.adapter(createAdapter(pubClient, subClient));
+    console.log('Socket.IO adapter configured with Redis');
+  })
+  .catch((err) => {
+    console.error('Failed to connect to Redis:', err);
+    console.log('Server will continue without Redis adapter');
+  });
 
 
 // compress all requests
@@ -40,6 +53,10 @@ app.use((req, res) => res.sendFile(__dirname + '/dist/index.html'));
 app.use(favicon('./dist/favicon.ico'));
 // Switch off the default 'X-Powered-By: Express' header
 app.disable('x-powered-by');
+
+// Store room data globally
+const rooms = new Map();
+
 io.on('connection', socket => {
   console.log("connection")
   let room = '';
@@ -51,8 +68,12 @@ io.on('connection', socket => {
   socket.on('disconnect', async function () {
     try {
       const rs =  await io.in(room).allSockets();
-      if (rs.has(socket.id)) { 
+      if (rs.has(socket.id)) {
         socket.to(room).emit('hangup');
+      }
+      // Clean up room data if room is empty
+      if (room && rs.size === 0) {
+        rooms.delete(room);
       }
     }catch(e){
       console.log("HEYYYYY WAIT WHER ARE YOU GOING?")
@@ -82,8 +103,16 @@ io.on('connection', socket => {
       broadcaster_id = socket.id;
       fee = stateObj.fee;
       interval = stateObj.interval;
+      // Store room data
+      rooms.set(room, {
+        broadcaster_id: socket.id,
+        fee: stateObj.fee,
+        interval: stateObj.interval
+      });
     } else if (sr.size === 1) {
-      socket.emit('join',{fee,interval,sid: broadcaster_id});
+      // Get room data
+      const roomData = rooms.get(room) || { fee: 0, interval: 0, broadcaster_id: '' };
+      socket.emit('join', { fee: roomData.fee, interval: roomData.interval, sid: roomData.broadcaster_id });
       payment = stateObj.payment
     } else { // max two clients
       socket.emit('full', room);
@@ -150,8 +179,13 @@ io.on('connection', socket => {
     const sid = data.sid
     console.log("lock",data)
     if(sid) {
-      await io.of('/').adapter.remoteJoin(data.sid,room);
-      console.log("lock sockets:", await io.in(room).allSockets())
+      const targetSocket = io.sockets.sockets.get(sid);
+      if (targetSocket) {
+        targetSocket.join(room);
+        console.log("lock sockets:", await io.in(room).allSockets())
+      } else {
+        socket.broadcast.to(room).emit('hangup', "cannot lock room - socket not found");
+      }
     }else {
       socket.broadcast.to(room).emit('hangup', "cannot lock room");
     }
@@ -169,7 +203,10 @@ io.on('connection', socket => {
 
   socket.on('reject', async (sid,message) => {
     console.log("reject" , sid, message)
-    await io.of('/').adapter.remoteLeave(sid,room);
+    const targetSocket = io.sockets.sockets.get(sid);
+    if (targetSocket) {
+      targetSocket.leave(room);
+    }
     console.log(await io.in(room).allSockets())
     io.to(sid).emit('hangup',message)
     //socket.emit('full')
@@ -183,18 +220,23 @@ io.on('connection', socket => {
       console.log("ZZZ",viewr_socket);
       if(viewr_socket > '') {
         io.to(viewr_socket).emit('hangup',"Earner hangup")
-        await io.of('/').adapter.remoteLeave(viewr_socket,room);
-      } 
+        const targetSocket = io.sockets.sockets.get(viewr_socket);
+        if (targetSocket) {
+          targetSocket.leave(room);
+        }
+      }
       const Rooms2 = io.of("/").adapter.rooms;
-      const Room2 = Array.from(Rooms2.get(room))    
+      const Room2 = Array.from(Rooms2.get(room))
       console.log("leaave1",viewr_socket,room);
+      // Clean up room data when broadcaster leaves
+      rooms.delete(room);
     }else {
       const rs =  await io.in(room).allSockets();
       if (rs.has(socket.id)){
         socket.to(room).emit('hangup',"Provider Has left the Space");
         socket.leave(room);
       }
-    } 
+    }
   });
 });
 

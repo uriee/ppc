@@ -1,104 +1,58 @@
-import { ethers, Contract } from 'ethers';
-import PPIToken from './contract/CryptoMeetMeDemo.json';
-
-const networks = {
-    polygon: {
-      chainId: `0x${Number(137).toString(16)}`,
-      chainName: "Polygon Mainnet",
-      nativeCurrency: {
-        name: "MATIC",
-        symbol: "MATIC",
-        decimals: 18
-      },
-      rpcUrls: ["https://polygon-rpc.com/"],
-      blockExplorerUrls: ["https://polygonscan.com/"]
-    },
-    bsc: {
-      chainId: `0x${Number(56).toString(16)}`,
-      chainName: "Binance Smart Chain Mainnet",
-      nativeCurrency: {
-        name: "Binance Chain Native Token",
-        symbol: "BNB",
-        decimals: 18
-      },
-      rpcUrls: [
-        "https://bsc-dataseed1.binance.org",
-        "https://bsc-dataseed2.binance.org",
-        "https://bsc-dataseed3.binance.org",
-        "https://bsc-dataseed4.binance.org",
-        "https://bsc-dataseed1.defibit.io",
-        "https://bsc-dataseed2.defibit.io",
-        "https://bsc-dataseed3.defibit.io",
-        "https://bsc-dataseed4.defibit.io",
-        "https://bsc-dataseed1.ninicoin.io",
-        "https://bsc-dataseed2.ninicoin.io",
-        "https://bsc-dataseed3.ninicoin.io",
-        "https://bsc-dataseed4.ninicoin.io",
-        "wss://bsc-ws-node.nariox.org"
-      ],
-      blockExplorerUrls: ["https://bscscan.com"]
-    },
-    bsc_testnet: {
-      chainId: `0x${Number(97).toString(16)}`,
-      chainName: "Binance Smart Chain Testnet",
-      nativeCurrency: {
-        name: "Binance Chain Native Token",
-        symbol: "BNB",
-        decimals: 18
-      },
-      rpcUrls: [
-        "https://data-seed-prebsc-1-s1.binance.org:8545/",
-      ],
-      blockExplorerUrls: ["https://testnet.bscscan.com"]
-    }  
-  };
-
+// Mock blockchain module - no real crypto interactions
+// All blockchain/wallet interactions are mocked for demo purposes
 
 const getBlockchain = () => new Promise((resolve, reject) => {
-    console.log("A")
+    console.log("Mock blockchain initialization")
 
-    const set_network = async (network) => {
-        try {
-            if (!window.ethereum) throw new Error("No crypto wallet found");
-            await window.ethereum.request({
-              method: "wallet_addEthereumChain",
-              params: [
-                {
-                  ...networks[network]
+    // Generate a mock address
+    const mockAddress = '0x' + Math.random().toString(16).substr(2, 40).toUpperCase();
+
+    // Create a mock token object with the required methods
+    const mockToken = {
+        // Mock approve method - simulates token approval
+        approve: async (address, amount) => {
+            console.log(`Mock approve: ${amount} tokens for ${address}`);
+            return {
+                wait: async () => {
+                    // Simulate transaction confirmation delay
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    return { status: 1 }; // Success
                 }
-              ]
-            });
-        } catch (err) {
-            reject(err.msg);
-        }       
-    }   
-    const set_token = async () => {
-        console.log("B")
-        if(window.ethereum) {
-            console.log("C")
-            await window.ethereum.enable();
-            const provider = new ethers.providers.Web3Provider(window.ethereum)
-            const signer = provider.getSigner();
-            const signerAddress = await signer.getAddress();
+            };
+        },
 
-            const ppcToken = new Contract(
-                "0x69ce221ac9b1cd69c1daf16476516f453c30380f",
-                PPIToken.output.abi,
-                signer
-            );
+        // Mock transferFrom method - simulates token transfer
+        transferFrom: async (from, to, amount) => {
+            console.log(`Mock transferFrom: ${amount} tokens from ${from} to ${to}`);
+            return {
+                wait: async () => {
+                    // Simulate transaction confirmation delay
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    return { status: 1 }; // Success
+                }
+            };
+        },
 
-            resolve({signerAddress, ppcToken});
-        }else{
-            resolve({signerAddress: 0 , ppcToken : 0 })
+        // Mock faucet method - simulates getting tokens from faucet
+        transferFromDemo: async (address) => {
+            console.log(`Mock faucet: sending tokens to ${address}`);
+            return {
+                wait: async () => {
+                    // Simulate transaction confirmation delay
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+                    return { status: 1 }; // Success
+                }
+            };
         }
-    }
+    };
 
-    const run = async () => {
-        const done = await set_network("bsc_testnet");
-        set_token()
-    }
-
-    run();
-})
+    // Simulate async initialization
+    setTimeout(() => {
+        resolve({
+            signerAddress: mockAddress,
+            ppcToken: mockToken
+        });
+    }, 500);
+});
 
 export default getBlockchain;

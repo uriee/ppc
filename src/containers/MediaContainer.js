@@ -3,7 +3,6 @@ import { PropTypes } from 'prop-types';
 import store from '../store'
 import { Redirect } from 'react-router-dom';
 
-import getBlockchain from '../../ethereum.js';
 import regeneratorRuntime, { async } from "regenerator-runtime"
 
 import { ToastContainer, toast } from 'react-toastify';
@@ -25,6 +24,7 @@ class MediaBridge extends Component {
     this.hangup = this.hangup.bind(this);
     this.shareScreen = this.shareScreen.bind(this);
     this.init = this.init.bind(this);
+    this.cleanupPeerConnection = this.cleanupPeerConnection.bind(this);
   }
   componentDidMount() {
     const pageloader = document.getElementById('pageloader');
@@ -34,13 +34,18 @@ class MediaBridge extends Component {
         infraloader.classList.remove('is-active');
         pageloader.classList.toggle('is-active');
         clearTimeout(pageloaderTimeout);
-    }, 1200);     
+    }, 1200);
     this.props.media(this);
     this.props.getUserMedia
-      .then(stream => this.localVideo.srcObject = this.localStream = stream);
+      .then(stream => {
+        if (this.localVideo) {
+          this.localVideo.srcObject = this.localStream = stream;
+        }
+      })
+      .catch(err => console.error('Error setting local video stream:', err));
     this.props.socket.on('message', this.onMessage);
     this.props.socket.on('hangup', this.onRemoteHangup);
-    
+
     this.props.socket.on('disconnect', this.onRemoteHangup);
     this.props.socket.on('claim', this.onClaim);
   }
@@ -52,15 +57,38 @@ class MediaBridge extends Component {
     }
     this.props.socket.emit('leave');
   }
+  cleanupPeerConnection() {
+    console.log('Cleaning up peer connection...');
+    // Close and cleanup peer connection
+    if (this.pc) {
+      this.pc.close();
+      this.pc = null;
+    }
+    // Close data channel
+    if (this.dc) {
+      this.dc.close();
+      this.dc = null;
+    }
+    // Stop remote stream
+    if (this.remoteStream) {
+      this.remoteStream.getVideoTracks().forEach(track => track.stop());
+      this.remoteStream.getAudioTracks().forEach(track => track.stop());
+      this.remoteStream = null;
+    }
+    // Clear remote video
+    if (this.remoteVideo) {
+      this.remoteVideo.srcObject = null;
+    }
+  }
+
   async onRemoteHangup(message) {
     const owner = store.getState().owner;
     console.log("OWNER onRemoteHangup",owner)
     this.setState({bridge: 'host-hangup',  minutes: 0});
-    this.remoteStream.getVideoTracks()[0].stop();
-      this.remoteStream.getAudioTracks().map(x => x.stop())    
+    this.cleanupPeerConnection();
     if(!owner){
       toast.error(message)
-      await new Promise(resolve => setTimeout(resolve, 3000));  
+      await new Promise(resolve => setTimeout(resolve, 3000));
       window.history.back()
     }else{
       toast("Session Hangup", { autoClose: 2000, pauseOnHover: false })
@@ -117,20 +145,18 @@ class MediaBridge extends Component {
   }
 
   async hangup() {
-    confirm('Are you sure you want to leave? The Meeting will terminate')    
+    confirm('Are you sure you want to leave? The Meeting will terminate')
     const owner = store.getState().owner;
     console.log("OWNER hangup",owner)
-    this.remoteStream.getVideoTracks()[0].stop();
-    this.remoteStream.getAudioTracks().map(x => x.stop())     
+    this.cleanupPeerConnection();
     if(owner) {
       this.setState({bridge: 'host-hangup'})
     } else {
       this.setState({bridge: 'full'})
-      this.pc.close()
       toast.error(`Broadcastre HangUp`)
-      await new Promise(resolve => setTimeout(resolve, 3000));  
-      window.history.back()      
-    }  
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      window.history.back()
+    }
     this.props.socket.emit('leave');
   }
 
@@ -160,21 +186,30 @@ class MediaBridge extends Component {
   }
   
   init() {
+    console.log('init() called, user:', this.state.user, 'bridge:', this.state.bridge);
+
+    // Clean up any existing peer connection before creating a new one
+    if (this.pc) {
+      console.log('Existing peer connection found, cleaning up...');
+      this.cleanupPeerConnection();
+    }
+
     // wait for local media to be ready
     const attachMediaIfReady = () => {
       this.dc = this.pc.createDataChannel('chat');
       this.setupDataHandlers();
-      console.log('attachMediaIfReady')
+      console.log('attachMediaIfReady - creating offer')
       this.pc.createOffer()
         .then(this.setDescription)
         .then(this.sendDescription)
         .catch(this.handleError); // An error occurred, so handle the failure to connect
-        
+
     }
     // set up the peer connection
     // this is one of Google's public STUN servers
     // make sure your offer/answer role does not change. If user A does a SLD
     // with type=offer initially, it must do that during  the whole session
+    console.log('Creating RTCPeerConnection...');
     this.pc = new RTCPeerConnection({iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]});
     // when our browser gets a candidate, send it to the peer
     this.pc.onicecandidate = e => {
@@ -213,12 +248,17 @@ class MediaBridge extends Component {
         //sendData('hello');
     };
     // attach local media to the peer connection
+    console.log('Adding tracks to peer connection, localStream tracks:', this.localStream?.getTracks().length);
     this.localStream.getTracks().forEach(track => this.pc.addTrack(track, this.localStream));
     // call if we were the last to connect (to increase
     // chances that everything is set up properly at both ends)
+    console.log('Checking if should create offer, user:', this.state.user);
     if (this.state.user === 'host') {
+      console.log('User is host, creating offer...');
       this.props.getUserMedia.then(attachMediaIfReady);
-    }  
+    } else {
+      console.log('User is NOT host (guest), waiting for offer...');
+    }
   }
   render(){
     return (
