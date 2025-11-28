@@ -1,14 +1,45 @@
 const path = require("path");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const webpack = require("webpack");
 
 module.exports = {
+  entry: "./src/index.js",
+  output: {
+    path: path.join(__dirname, "/dist"),
+    filename: "bundle.js",
+    publicPath: '/'
+  },
+  resolve: {
+    extensions: [".js", ".jsx", ".json"],
+    fallback: {
+      "process": require.resolve("process/browser"),
+      "crypto": require.resolve("crypto-browserify"),
+      "stream": require.resolve("stream-browserify"),
+      "vm": require.resolve("vm-browserify"),
+      "buffer": require.resolve("buffer/")
+    }
+  },
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: "./public/index.html",
+    }),
+    new webpack.ProvidePlugin({
+      process: 'process/browser',
+      Buffer: ['buffer', 'Buffer'],
+    }),
+  ],
   module: {
     rules: [
       {
-        test: /\.js$/,
+        test: /\.(js|jsx)$/,
         exclude: /node_modules/,
-        use: ["babel-loader"]
+        use: {
+          loader: "babel-loader",
+          options: {
+            presets: ["@babel/preset-env", "@babel/preset-react"]
+          }
+        }
       },
-
       {
         test: /\.css$/,
         use: ["style-loader", "css-loader"]
@@ -17,32 +48,23 @@ module.exports = {
         test: /\.js$/,
         enforce: 'pre',
         use: ['source-map-loader'],
+        exclude: /node_modules/,
       },
-      
       {
         test: /\.svg$/,
-        use: [
-          {
-            loader: 'svg-url-loader',
-            options: {
-              limit: 10000,
-            },
-          },
-        ],
+        type: 'asset/resource'
       },
-      /*
       {
         test: /\.(png|jp(e*)g|gif)$/,
-        use: [
-          {
-            loader: 'file-loader',
-            options: {
-              name: 'img/[hash]-[name].[ext]',
-            },
-          },
-        ],
-      },
-      */
+        type: 'asset/resource'
+      }
     ]
+  },
+  devServer: {
+    historyApiFallback: true,
+    static: {
+      directory: path.join(__dirname, 'public'),
+    },
+    port: 3000,
   }
 };

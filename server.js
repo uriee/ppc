@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const http = require('http');
 const https = require('https');
-const { Server }= require('socket.io');
+const { Server } = require('socket.io');
 const favicon = require('serve-favicon');
 const compression = require('compression');
 
@@ -11,26 +11,29 @@ const { createAdapter } = require("@socket.io/redis-adapter")
 const { createClient } = require("redis")
 
 const app = express(),
-  options = { 
+  options = {
     key: fs.readFileSync(__dirname + '/rtc-video-room-key.pem'),
     cert: fs.readFileSync(__dirname + '/rtc-video-room-cert.pem')
   },
-port = 3002,
-server = process.env.NODE_ENV === 'production' ?
-  http.createServer(app).listen(port) :
-  https.createServer(options, app).listen(port)
+  port = 3002,
+  server = process.env.NODE_ENV === 'production' ?
+    http.createServer(app).listen(port) :
+    https.createServer(options, app).listen(port)
 
-const io = new Server(server, {'transports': ['websocket']  });
+const io = new Server(server, { 'transports': ['websocket'] });
 
+// Redis setup - optional
+// const { createAdapter } = require("@socket.io/redis-adapter");
+// const { createClient } = require("redis");
+// const pubClient = createClient({ url: "redis://localhost:6379" });
+// const subClient = pubClient.duplicate();
 
-const pubClient = createClient({ url: "redis://localhost:6379" });
-const subClient = pubClient.duplicate();
-//io.adapter(createAdapter(pubClient, subClient));
-
-Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
-  io.adapter(createAdapter(pubClient, subClient));
-  //io.listen(3000);
-});
+// Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
+//   io.adapter(createAdapter(pubClient, subClient));
+//   console.log("Redis adapter connected");
+// }).catch(err => {
+//   console.log("Redis connection failed, falling back to memory adapter", err);
+// });
 
 
 // compress all requests
@@ -50,20 +53,20 @@ io.on('connection', socket => {
 
   socket.on('disconnect', async function () {
     try {
-      const rs =  await io.in(room).allSockets();
-      if (rs.has(socket.id)) { 
+      const rs = await io.in(room).allSockets();
+      if (rs.has(socket.id)) {
         socket.to(room).emit('hangup');
       }
-    }catch(e){
+    } catch (e) {
       console.log("HEYYYYY WAIT WHER ARE YOU GOING?")
     }
   });
 
   // sending to all clients in the room (channel) except sender
   socket.on('message', async message => {
-    console.log("messgae",message)
+    console.log("messgae", message)
     const sr = await io.in(room).allSockets();
-    console.log("HAAA:",sr)
+    console.log("HAAA:", sr)
     socket.to(room).emit('message', message)
   });
 
@@ -73,17 +76,17 @@ io.on('connection', socket => {
     const sr = await io.in(room).allSockets();
     sr.delete(null)
 
-    console.log("find",room,sr,sr && sr.size)
+    console.log("find", room, sr, sr && sr.size)
 
     if (sr && sr.size == 0) {
       // no room with such name is found so create it
       socket.join(room);
-      socket.emit('create',{id: socket.id});
+      socket.emit('create', { id: socket.id });
       broadcaster_id = socket.id;
       fee = stateObj.fee;
       interval = stateObj.interval;
     } else if (sr.size === 1) {
-      socket.emit('join',{fee,interval,sid: broadcaster_id});
+      socket.emit('join', { fee, interval, sid: broadcaster_id });
       payment = stateObj.payment
     } else { // max two clients
       socket.emit('full', room);
@@ -93,15 +96,15 @@ io.on('connection', socket => {
 
   //viewer event
   socket.on('addr_v', async data => {
-    console.log("addr_v",data,) 
-    const rs =  await io.in(room).allSockets();
+    console.log("addr_v", data,)
+    const rs = await io.in(room).allSockets();
     const broadcaster_socket = (Array.from(rs)).filter(x => x != socket.id)[0] || 0
-    console.log("broadcaster socket:",data.chatID , broadcaster_socket)
-    if ( data.chatID > '' && !(data.chatID == broadcaster_socket)) {
-      socket.emit('hangup',"Wrong Chat ID")
-    }else{
-        //data.sid = socket.sid;
-      let ret = {addr_v : data , sid: socket.id}
+    console.log("broadcaster socket:", data.chatID, broadcaster_socket)
+    if (data.chatID > '' && !(data.chatID == broadcaster_socket)) {
+      socket.emit('hangup', "Wrong Chat ID")
+    } else {
+      //data.sid = socket.sid;
+      let ret = { addr_v: data, sid: socket.id }
       // sending to all clients in the room (channel) except sender
       socket.to(room).emit('addr_v', ret);
     }
@@ -109,31 +112,31 @@ io.on('connection', socket => {
 
   //broadcaster event
   socket.on('addr_b', data => {
-    let {addr_b , sid } = data;
+    let { addr_b, sid } = data;
     fee = data.fee;
     interval = data.interval;
-    console.log("addr_b",addr_b,sid,fee,data)
+    console.log("addr_b", addr_b, sid, fee, data)
     data.bsid = socket.id;
     // sending to all clients in the room (channel) except sender
-    io.to(sid).emit('addr_b',data)
+    io.to(sid).emit('addr_b', data)
     ///socket.broadcast.to(room).emit('addr_b', data);
   });
-    
+
   socket.on('auth', data => {
-    console.log("auth",data)
+    console.log("auth", data)
     data.sid = socket.id;
     // sending to all clients in the room (channel) except sender
     socket.broadcast.to(room).emit('approve', data);
   });
 
   socket.on('pending', sid => {
-    console.log("pending",sid)
+    console.log("pending", sid)
     // sending to all clients in the room (channel) except sender
     socket.broadcast.to(room).emit('pending', sid);
   });
 
   socket.on('claim', (sid) => {
-    console.log("claim",sid)
+    console.log("claim", sid)
     // sending to all clients in the room (channel) except sender
     io.to(sid).emit('claim')
     //socket.broadcast.to(room).emit('claim');
@@ -141,18 +144,19 @@ io.on('connection', socket => {
 
   socket.on('transfer', (data) => {
     data.sid = socket.id
-    console.log("transer1",data)
+    console.log("transer1", data)
     // sending to all clients in the room (channel) except sender
     socket.broadcast.to(room).emit('transfer', data);
   });
 
   socket.on('lock', async (data) => {
     const sid = data.sid
-    console.log("lock",data)
-    if(sid) {
-      await io.of('/').adapter.remoteJoin(data.sid,room);
+    console.log("lock", data)
+    if (sid) {
+      // Use socketsJoin instead of remoteJoin (works with in-memory adapter)
+      await io.in(sid).socketsJoin(room);
       console.log("lock sockets:", await io.in(room).allSockets())
-    }else {
+    } else {
       socket.broadcast.to(room).emit('hangup', "cannot lock room");
     }
 
@@ -161,40 +165,42 @@ io.on('connection', socket => {
   });
 
   socket.on('accept', async (sid) => {
-    console.log("accept",sid)
-    const ret = {fee , interval}; 
+    console.log("accept", sid)
+    const ret = { fee, interval };
     // sending to all clients in 'game' room(channel), include sender
-    io.in(room).emit('bridge',ret);
+    io.in(room).emit('bridge', ret);
   });
 
-  socket.on('reject', async (sid,message) => {
-    console.log("reject" , sid, message)
-    await io.of('/').adapter.remoteLeave(sid,room);
+  socket.on('reject', async (sid, message) => {
+    console.log("reject", sid, message)
+    // Use socketsLeave instead of remoteLeave (works with in-memory adapter)
+    await io.in(sid).socketsLeave(room);
     console.log(await io.in(room).allSockets())
-    io.to(sid).emit('hangup',message)
+    io.to(sid).emit('hangup', message)
     //socket.emit('full')
   });
-  
+
   socket.on('leave', async () => {
     console.log("leave")
     if (socket.id == broadcaster_id) {
-      const rs =  await io.in(room).allSockets();
+      const rs = await io.in(room).allSockets();
       const viewr_socket = (Array.from(rs)).filter(x => x != socket.id)[0] || 0
-      console.log("ZZZ",viewr_socket);
-      if(viewr_socket > '') {
-        io.to(viewr_socket).emit('hangup',"Earner hangup")
-        await io.of('/').adapter.remoteLeave(viewr_socket,room);
-      } 
+      console.log("ZZZ", viewr_socket);
+      if (viewr_socket > '') {
+        io.to(viewr_socket).emit('hangup', "Earner hangup")
+        // Use socketsLeave instead of remoteLeave (works with in-memory adapter)
+        await io.in(viewr_socket).socketsLeave(room);
+      }
       const Rooms2 = io.of("/").adapter.rooms;
-      const Room2 = Array.from(Rooms2.get(room))    
-      console.log("leaave1",viewr_socket,room);
-    }else {
-      const rs =  await io.in(room).allSockets();
-      if (rs.has(socket.id)){
-        socket.to(room).emit('hangup',"Provider Has left the Space");
+      const Room2 = Array.from(Rooms2.get(room))
+      console.log("leaave1", viewr_socket, room);
+    } else {
+      const rs = await io.in(room).allSockets();
+      if (rs.has(socket.id)) {
+        socket.to(room).emit('hangup', "Provider Has left the Space");
         socket.leave(room);
       }
-    } 
+    }
   });
 });
 
